@@ -1,0 +1,969 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>NOIDLE // MASTER_SHIP_V7</title>
+    
+    <!-- FONTS -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=DM+Mono:ital,wght@0,300;0,400;0,500;1,300;1,400&family=Jersey+25&display=swap" rel="stylesheet">
+    
+    <!-- ICONS -->
+    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20,300,0,0" rel="stylesheet" />
+
+    <!-- Tailwind -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    
+    <!-- Config -->
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        white: '#FFFFFF',
+                        black: '#151515', 
+                        gray: '#A0A0A0',
+                        lightGray: '#E5E5E5',
+                    },
+                    fontFamily: {
+                        mono: ['"DM Mono"', 'monospace'], 
+                        pixel: ['"Jersey 25"', 'sans-serif'],
+                    },
+                }
+            }
+        }
+    </script>
+
+    <!-- React -->
+    <script crossorigin src="https://unpkg.com/react@18/umd/react.development.js"></script>
+    <script crossorigin src="https://unpkg.com/react-dom@18/umd/react-dom.development.js"></script>
+    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+
+    <style>
+        body {
+            background-color: #FFFFFF;
+            color: #151515;
+            font-family: "DM Mono", monospace;
+            -webkit-font-smoothing: antialiased;
+            transition: background-color 0.4s ease, color 0.4s ease;
+        }
+        
+        .no-scrollbar::-webkit-scrollbar { display: none; }
+        .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+        
+        input[type=range] { -webkit-appearance: none; width: 100%; background: transparent; }
+        input[type=range]::-webkit-slider-thumb {
+            -webkit-appearance: none; height: 8px; width: 8px;
+            background: currentColor; cursor: pointer;
+            margin-top: -3px; border: 1px solid currentColor;
+        }
+        input[type=range]::-webkit-slider-runnable-track { width: 100%; height: 2px; cursor: pointer; background: transparent; }
+        input[type=range]:focus { outline: none; }
+
+        /* --- DESKTOP RETRO MODE --- */
+        @media (min-width: 1024px) {
+            .retro-mode {
+                background-color: #050505 !important;
+                color: #C0C0C0 !important;
+                font-family: "Jersey 25", sans-serif !important;
+                image-rendering: pixelated; 
+                -webkit-font-smoothing: none;
+            }
+
+            .retro-mode::after {
+                content: " ";
+                display: block;
+                position: absolute;
+                top: 0; left: 0; bottom: 0; right: 0;
+                background: linear-gradient(rgba(18, 16, 16, 0) 50%, rgba(0, 0, 0, 0.25) 50%);
+                background-size: 100% 4px;
+                z-index: 9999;
+                pointer-events: none;
+            }
+            
+            .retro-mode .border, .retro-mode .border-black, .retro-mode .border-gray, .retro-mode .border-current {
+                border-color: #444 !important;
+                border-radius: 0px !important;
+            }
+            .retro-mode img { filter: grayscale(100%) contrast(150%) brightness(0.8); }
+            .retro-mode canvas { filter: invert(1) hue-rotate(180deg); opacity: 0.8; }
+            .retro-mode .text-xs { font-size: 16px !important; letter-spacing: 0.5px; }
+            .retro-mode .text-sm { font-size: 20px !important; }
+            .retro-mode .text-5xl { font-size: 56px !important; }
+        }
+
+        /* --- MOBILE DESIGNER DARK MODE --- */
+        @media (max-width: 1023px) {
+            .retro-mode {
+                background-color: #0F0F0F !important;
+                color: #F0F0F0 !important;
+            }
+            .retro-mode .border, .retro-mode .border-black {
+                border-color: #333 !important;
+            }
+            .retro-mode .bg-black { background-color: #222 !important; }
+            .retro-mode .text-black { color: #FFF !important; }
+            .retro-mode button.border-black { border-color: #555 !important; color: #FFF !important; }
+        }
+    </style>
+</head>
+<body class="h-full w-full lg:h-screen lg:overflow-hidden flex flex-col lg:px-12 lg:pt-12 lg:pb-4">
+
+    <div id="root" class="h-full flex flex-col"></div>
+
+    <script type="text/babel">
+        const { useState, useMemo, useEffect, useRef, useCallback, useContext, createContext } = React;
+
+        const ThemeContext = createContext();
+
+        const projectsData = [
+            {"id":1,"title":"Take A Daytrip x Nessly","artist":"Take A Daytrip","location":"Atlanta","type":"Collaboration","category":"Projects"},
+            {"id":2,"title":"MINGO - MTM","artist":"Mingo","location":"Bordeaux","type":"EP","category":"Projects"},
+            {"id":3,"title":"Nightcrawler","artist":"18yoman","location":"Toronto","type":"Single","category":"Songs"},
+            {"id":4,"title":"Cabin Files Vol. 1","artist":"Grogs","location":"Detroit","type":"Pack","category":"Cabin Files"},
+            {"id":5,"title":"Fireside Sessions","artist":"Mel Debarge","location":"Santo Domingo","type":"DJ Set","category":"Cabin Files"},
+            {"id":6,"title":"Solar 32 Drum Pack","artist":"18yoman","location":"Vermont","type":"Sample Pack","category":"Drum Packs"},
+            {"id":7,"title":"Tokyo Drift","artist":"Take A Daytrip","location":"Tokyo","type":"Single","category":"Songs"},
+            {"id":8,"title":"Berlin Techno Tools","artist":"Mingo","location":"Berlin","type":"TenTools","category":"TenTools"},
+            {"id":9,"title":"London Grime Kit","artist":"Grogs","location":"London","type":"Sample Pack","category":"Drum Packs"},
+            {"id":10,"title":"Paris Fashion Week Mix","artist":"Mel Debarge","location":"Paris","type":"Mix","category":"Songs"},
+            {"id":11,"title":"LA Sunset Sessions","artist":"18yoman","location":"Los Angeles","type":"Live","category":"Songs"},
+            {"id":12,"title":"NYC Rooftop","artist":"Take A Daytrip","location":"New York","type":"Live","category":"Songs"}
+        ];
+
+        const cityCoords = {"Atlanta": { lat: 33.7, lng: -84.3 }, "Bordeaux": { lat: 44.8, lng: -0.5 }, "Vermont": { lat: 44.5, lng: -72.5 }, "Detroit": { lat: 42.3, lng: -83.0 }, "Toronto": { lat: 43.6, lng: -79.3 }, "Santo Domingo": { lat: 18.4, lng: -69.9 }, "Tokyo": { lat: 35.6, lng: 139.6 }, "Berlin": { lat: 52.5, lng: 13.4 }, "London": { lat: 51.5, lng: -0.1 }, "Paris": { lat: 48.8, lng: 2.3 }, "Los Angeles": { lat: 34.0, lng: -118.2 }, "New York": { lat: 40.7, lng: -74.0 }};
+        const fixedArtistList = ["Take A Daytrip", "Mingo", "18yoman", "Grogs", "Mel Debarge"];
+
+        const OscilloscopeText = ({ text, isActive, onClick }) => {
+            const [isHovered, setIsHovered] = useState(false);
+            const textRef = useRef(null);
+            const canvasRef = useRef(null);
+            const [width, setWidth] = useState(0);
+            const { theme } = useContext(ThemeContext);
+            const unselectedColor = '#545454'; 
+
+            useEffect(() => { if (textRef.current) setWidth(textRef.current.offsetWidth); }, [text]);
+
+            useEffect(() => {
+                if (!isHovered || !width) return;
+                const canvas = canvasRef.current;
+                const ctx = canvas.getContext('2d');
+                let animationId;
+                let time = 0;
+
+                const render = () => {
+                    ctx.clearRect(0, 0, width, 20);
+                    ctx.beginPath();
+                    ctx.strokeStyle = theme === 'retro' ? '#C0C0C0' : "#151515"; 
+                    ctx.lineWidth = 1.5;
+                    for (let x = 0; x < width; x++) {
+                        const normalizedX = x / width; 
+                        const y = 10 + Math.sin(x * 0.2 + time) * 8 * Math.sin(normalizedX * Math.PI);
+                        const drawX = theme === 'retro' ? Math.round(x) : x; 
+                        if (x === 0) ctx.moveTo(drawX, y); else ctx.lineTo(drawX, y);
+                    }
+                    ctx.stroke();
+                    time += 0.4;
+                    animationId = requestAnimationFrame(render);
+                };
+                render();
+                return () => cancelAnimationFrame(animationId);
+            }, [isHovered, width, theme]);
+
+            return (
+                <button 
+                    onClick={onClick} onMouseEnter={() => setIsHovered(true)} onMouseLeave={() => setIsHovered(false)}
+                    className="text-left py-1 h-6 relative flex items-center w-fit group"
+                >
+                    <span ref={textRef} className={`opacity-0 pointer-events-none whitespace-nowrap text-xs font-medium uppercase`}>{text}</span>
+                    <span 
+                        className={`absolute inset-0 whitespace-nowrap text-xs font-medium uppercase transition-opacity duration-0 ${isHovered ? 'opacity-0' : 'opacity-100'} ${isActive ? (theme === 'retro' ? 'text-white underline' : 'text-black font-bold') : ''}`}
+                        style={{ color: !isActive && theme !== 'retro' ? unselectedColor : undefined }}
+                    >
+                        {text}
+                    </span>
+                    {isHovered && <canvas ref={canvasRef} width={width} height={20} className="absolute inset-0 top-1"/>}
+                </button>
+            );
+        };
+
+        const DummyLoader = ({ title, subtext }) => {
+            const { theme } = useContext(ThemeContext);
+            const bars = useMemo(() => Array.from({length: 9}).map(() => Math.floor(Math.random() * 60) + 10), []);
+
+            if (title === "SEARCH") return (
+                <div className="w-full h-full p-8 flex flex-col justify-center animate-in fade-in">
+                    <div className={`border-b-2 ${theme === 'retro' ? 'border-[#444]' : 'border-black'} w-full flex items-center gap-2 pb-2`}>
+                        <span className="material-symbols-outlined text-lg">search</span>
+                        <input type="text" autoFocus className="w-full bg-transparent outline-none uppercase font-mono text-xl placeholder-gray-500" placeholder="SEARCH DATABASE..." />
+                        <div className={`w-2 h-6 ${theme === 'retro' ? 'bg-[#C0C0C0]' : 'bg-black'} animate-pulse`}></div>
+                    </div>
+                </div>
+            );
+            if (title === "MERCH") return (
+                <div className="w-full h-full flex flex-col items-center justify-center animate-in fade-in">
+                    <span className="material-symbols-outlined text-4xl mb-4 animate-spin opacity-20">sync</span>
+                    <div className="text-sm font-bold uppercase">CONNECTING TO SHOPIFY...</div>
+                    <div className="text-xs text-gray-500 mt-2">SECURE_HANDSHAKE_INIT</div>
+                </div>
+            );
+            return (
+                <div className="w-full h-full p-6 flex flex-col animate-in fade-in bg-inherit">
+                    <div className={`flex justify-between items-end mb-4 border-b ${theme === 'retro' ? 'border-[#444]' : 'border-gray-200'} pb-2`}>
+                        <h2 className="text-xl uppercase tracking-tight">{title}</h2>
+                        <span className="text-[10px] uppercase text-gray-500 animate-pulse">{subtext || "LOADING..."}</span>
+                    </div>
+                    <div className="grid grid-cols-3 gap-4 h-full">
+                        {bars.map((width, i) => (
+                            <div key={i} className={`w-full h-full relative overflow-hidden flex flex-col justify-end p-2 ${theme === 'retro' ? 'border border-[#444] bg-[#050505]' : 'bg-gray-50'}`}>
+                                <div className="absolute top-2 left-2 text-[10px] opacity-50">FILE_{100 + i}.DAT</div>
+                                <div className={`h-2 w-full border border-current bg-transparent`}>
+                                    <div className={`h-full transition-all duration-[5000ms] ease-linear w-0 ${theme === 'retro' ? 'bg-[#C0C0C0]' : 'bg-black'}`} ref={el => { if(el) setTimeout(() => el.style.width = `${width}%`, 100); }}></div>
+                                </div>
+                            </div>
+                        ))}
+                    </div>
+                </div>
+            );
+        };
+
+        const UploadUI = () => {
+            const { theme } = useContext(ThemeContext);
+            const inputClass = "border-b border-gray-300 p-2 bg-transparent text-sm outline-none focus:border-current transition-colors w-full";
+            return (
+                <div className="w-full h-full p-8 flex flex-col animate-in fade-in">
+                    <div className={`border-b ${theme === 'retro' ? 'border-[#444]' : 'border-black'} pb-2 mb-6 flex justify-between items-center`}>
+                        <h2 className="text-xl uppercase font-bold">Cabin Upload</h2>
+                        <span className={`text-[10px] px-1 ${theme === 'retro' ? 'bg-[#C0C0C0] text-black' : 'bg-black text-white'}`}>ADMIN</span>
+                    </div>
+                    <div className="flex-1 flex flex-col gap-6">
+                        <div className="flex gap-4">
+                            <div className="w-1/2">
+                                <label className="text-[10px] uppercase font-bold opacity-60">Artist</label>
+                                <select className={inputClass}><option>Take A Daytrip</option><option>Mingo</option><option>+ Add New</option></select>
+                            </div>
+                            <div className="w-1/2">
+                                <label className="text-[10px] uppercase font-bold opacity-60">Location</label>
+                                <input type="text" className={inputClass} placeholder="CITY, COUNTRY" />
+                            </div>
+                        </div>
+                        <div><label className="text-[10px] uppercase font-bold opacity-60">Project Title</label><input type="text" className={inputClass} placeholder="ENTER TITLE" /></div>
+                        <div className={`flex-1 border-2 border-dashed rounded-lg flex items-center justify-center cursor-pointer transition-all hover:opacity-100 opacity-60 ${theme === 'retro' ? 'border-[#444] hover:bg-[#222]' : 'border-gray-300 hover:border-black hover:bg-gray-50'}`}>
+                             <div className="text-center"><span className="material-symbols-outlined mb-2">cloud_upload</span><div className="text-xs font-bold">DROP FILES HERE</div><div className="text-[10px] mt-1">WAV, PNG, JPG, TXT, MP4</div></div>
+                        </div>
+                        <div className="flex justify-end">
+                            <button className={`py-3 px-6 uppercase text-xs font-bold transition-colors ${theme === 'retro' ? 'bg-[#C0C0C0] text-black hover:bg-white' : 'bg-black text-white hover:bg-gray-800'}`}>Submit to Database</button>
+                        </div>
+                    </div>
+                </div>
+            )
+        }
+
+        const DesktopPlayer = ({ selectedProject, isPlaying, setIsPlaying, progress, setProgress, duration }) => {
+            const [isInverted, setIsInverted] = useState(false);
+            const canvasRef = useRef(null);
+            const { theme } = useContext(ThemeContext);
+
+            useEffect(() => {
+                const canvas = canvasRef.current;
+                const ctx = canvas.getContext('2d');
+                let animationId;
+                let time = 0;
+
+                const render = () => {
+                    if (canvas.width !== canvas.clientWidth) {
+                        canvas.width = canvas.clientWidth;
+                        canvas.height = canvas.clientHeight;
+                    }
+                    const w = canvas.width;
+                    const h = canvas.height;
+                    const cy = h / 2;
+
+                    const bg = isInverted ? (theme === 'retro' ? '#C0C0C0' : '#151515') : (theme === 'retro' ? '#111' : '#FFFFFF');
+                    const fg = isInverted ? (theme === 'retro' ? '#111' : '#FFFFFF') : (theme === 'retro' ? '#C0C0C0' : '#151515');
+                    
+                    ctx.fillStyle = bg;
+                    ctx.fillRect(0, 0, w, h);
+
+                    // Classic Grid
+                    ctx.strokeStyle = isInverted ? "rgba(255,255,255,0.1)" : "rgba(0,0,0,0.05)";
+                    ctx.lineWidth = 1;
+                    ctx.beginPath();
+                    for(let x=0; x<w; x+=20) { ctx.moveTo(x,0); ctx.lineTo(x,h); }
+                    for(let y=0; y<h; y+=20) { ctx.moveTo(0,y); ctx.lineTo(w,y); }
+                    ctx.stroke();
+
+                    // Waveform
+                    ctx.lineWidth = 2.5;
+                    ctx.strokeStyle = fg;
+                    ctx.beginPath();
+                    
+                    if (!isPlaying) {
+                        ctx.moveTo(0, cy); ctx.lineTo(w, cy);
+                    } else {
+                        for(let x=0; x<w; x+=2) {
+                            const y = cy + 
+                                Math.sin(x * 0.02 + time) * 15 +
+                                Math.sin(x * 0.05 - time * 1.5) * 8 +
+                                Math.sin(x * 0.1 + time * 0.5) * 4;
+                            
+                            if(x===0) ctx.moveTo(x,y); else ctx.lineTo(x,y);
+                        }
+                        time += 0.08; 
+                    }
+                    ctx.stroke();
+                    animationId = requestAnimationFrame(render);
+                };
+                render();
+                return () => cancelAnimationFrame(animationId);
+            }, [isPlaying, isInverted, theme, selectedProject]);
+
+            const formatTime = (s) => `${Math.floor(s/60).toString().padStart(2,'0')}:${Math.floor(s%60).toString().padStart(2,'0')}`;
+            const containerClass = isInverted ? "bg-black text-white border-white" : "bg-white text-black border-black";
+            const trackColor = isInverted ? 'bg-gray-800' : 'bg-gray-200';
+            const fillColor = isInverted ? 'bg-white' : 'bg-black';
+            const retroClass = theme === 'retro' ? 'border-[#444] bg-[#111]' : containerClass;
+
+            return (
+                <div className="flex-none flex-col justify-end hidden lg:flex">
+                    <div className={`border p-2 rounded-sm transition-colors duration-300 ${retroClass}`}>
+                        <div className="flex justify-between items-center text-[10px] mb-2 font-mono opacity-60">
+                            <div className="flex gap-2 items-center">
+                                <div className={`w-1.5 h-1.5 rounded-full ${isPlaying ? 'bg-current animate-pulse' : 'bg-gray-400'}`}></div>
+                                <span className="uppercase">{isPlaying ? 'Playing' : 'Idle'}</span>
+                            </div>
+                            <div>{formatTime((progress/100) * duration)} / {formatTime(duration)}</div>
+                        </div>
+                        <div className={`relative border rounded-sm overflow-hidden ${theme === 'retro' ? 'border-[#444]' : (isInverted ? 'border-white' : 'border-black')}`}>
+                            <div className="h-20 w-full relative">
+                                <canvas ref={canvasRef} className="w-full h-full relative z-10" />
+                                <button onClick={() => setIsInverted(!isInverted)} className={`absolute top-1 right-1 z-20 text-[8px] px-1 border font-bold uppercase cursor-pointer ${theme === 'retro' ? 'border-current text-current bg-transparent' : (isInverted ? 'border-white text-white' : 'border-black text-black')}`}>INV</button>
+                            </div>
+                            <div className={`h-2 w-full relative border-t ${theme === 'retro' ? 'bg-[#222] border-[#444]' : `${trackColor} ${isInverted ? 'border-gray-700' : 'border-gray-300'}`}`}>
+                                <div className={`h-full ${theme === 'retro' ? 'bg-[#C0C0C0]' : fillColor}`} style={{width: `${progress}%`}}></div>
+                                <input type="range" min="0" max="100" step="0.1" value={progress} onChange={(e) => setProgress(Number(e.target.value))} className="absolute inset-0 w-full h-full opacity-0 cursor-pointer z-30" />
+                            </div>
+                        </div>
+                        <div className="flex justify-between items-center mt-2 text-xs font-mono">
+                            <div className="uppercase w-32 truncate font-bold">{selectedProject ? selectedProject.title : "No Track"}</div>
+                            <button className={`border px-2 py-0.5 uppercase text-[10px] ${theme === 'retro' ? 'border-[#444] hover:bg-[#C0C0C0] hover:text-black' : (isInverted ? 'border-white hover:bg-white hover:text-black' : 'border-black hover:bg-black hover:text-white')}`} onClick={() => setIsPlaying(!isPlaying)}>{isPlaying ? 'PAUSE' : 'PLAY'}</button>
+                        </div>
+                    </div>
+                </div>
+            );
+        };
+
+        const MobilePlayer = ({ selectedProject, isPlaying, setIsPlaying, progress, setProgress }) => {
+            const { theme } = useContext(ThemeContext);
+            const [isExpanded, setIsExpanded] = useState(false);
+            const canvasRef = useRef(null);
+
+            // Handle scrubbing via drag on the expanded player
+            const handleScrub = (e) => {
+                if (!canvasRef.current) return;
+                const rect = canvasRef.current.getBoundingClientRect();
+                const clientX = e.touches ? e.touches[0].clientX : e.clientX;
+                let x = clientX - rect.left;
+                if (x < 0) x = 0;
+                if (x > rect.width) x = rect.width;
+                const pct = (x / rect.width) * 100;
+                setProgress(pct);
+            };
+
+            useEffect(() => {
+                if (!isExpanded || !canvasRef.current) return;
+                const canvas = canvasRef.current;
+                const ctx = canvas.getContext('2d');
+                let animationId;
+                let time = 0;
+
+                const render = () => {
+                    if (canvas.width !== canvas.clientWidth) {
+                        canvas.width = canvas.clientWidth;
+                        canvas.height = canvas.clientHeight;
+                    }
+                    const w = canvas.width;
+                    const h = canvas.height;
+                    const cy = h / 2;
+
+                    ctx.clearRect(0,0,w,h);
+                    ctx.lineWidth = 1;
+                    // Use a subtle color based on theme
+                    ctx.strokeStyle = theme === 'retro' ? "rgba(255,255,255,0.3)" : "rgba(0,0,0,0.15)";
+                    ctx.beginPath();
+                    
+                    if (!isPlaying) {
+                        ctx.moveTo(0, cy); ctx.lineTo(w, cy);
+                    } else {
+                        for(let x=0; x<w; x+=2) {
+                            const y = cy + 
+                                Math.sin(x * 0.02 + time) * 10 +
+                                Math.sin(x * 0.05 - time * 1.5) * 5;
+                            if(x===0) ctx.moveTo(x,y); else ctx.lineTo(x,y);
+                        }
+                        time += 0.08; 
+                    }
+                    ctx.stroke();
+                    animationId = requestAnimationFrame(render);
+                };
+                render();
+                return () => cancelAnimationFrame(animationId);
+            }, [isExpanded, isPlaying, theme]);
+
+            if (!selectedProject) return null;
+
+            return (
+                <div className={`fixed bottom-0 left-0 right-0 z-50 lg:hidden border-t transition-all duration-300 ${theme === 'retro' ? 'bg-[#0F0F0F] border-[#333]' : 'bg-white border-black'} ${isExpanded ? 'h-32' : 'h-14'}`}>
+                     
+                     {/* Minimized: Full Width Progress Bar at Bottom */}
+                     {!isExpanded && (
+                         <div className="absolute bottom-0 left-0 w-full h-1.5 bg-gray-100 dark:bg-gray-800 z-20">
+                             <div 
+                                className={`h-full transition-all duration-100 ${theme === 'retro' ? 'bg-[#C0C0C0]' : 'bg-black'}`} 
+                                style={{width: `${progress}%`}}
+                             ></div>
+                         </div>
+                     )}
+
+                     {/* Content Wrapper (Padded) */}
+                     <div className="px-4 pb-4 pt-2 w-full h-full flex flex-col relative z-30">
+                        <div className="flex justify-center -mt-2 mb-2" onClick={() => setIsExpanded(!isExpanded)}>
+                             <span className="material-symbols-outlined text-sm cursor-pointer opacity-50">{isExpanded ? 'expand_more' : 'expand_less'}</span>
+                        </div>
+                        
+                        {/* Expanded: Interactive Waveform for Scrubbing */}
+                        {isExpanded && (
+                            <div className="flex flex-col gap-3 relative z-10 pointer-events-none">
+                                <div className="flex justify-between items-center pointer-events-auto">
+                                    <div className="truncate pr-4">
+                                        <div className="text-xs font-bold uppercase truncate">{selectedProject.title}</div>
+                                        <div className="text-[10px] uppercase opacity-60">{selectedProject.artist}</div>
+                                    </div>
+                                    <button 
+                                        onClick={() => setIsPlaying(!isPlaying)}
+                                        className={`w-8 h-8 flex items-center justify-center border rounded-full ${theme === 'retro' ? 'border-[#555] bg-[#0F0F0F]' : 'border-black bg-white'}`}
+                                    >
+                                        <span className="material-symbols-outlined text-sm">{isPlaying ? 'pause' : 'play_arrow'}</span>
+                                    </button>
+                                </div>
+                                <div className="w-full h-1 bg-gray-200 dark:bg-gray-800 relative">
+                                    <div className={`h-full absolute left-0 top-0 transition-all duration-100 ${theme === 'retro' ? 'bg-white' : 'bg-black'}`} style={{width: `${progress}%`}}></div>
+                                </div>
+                            </div>
+                        )}
+                        
+                        {/* Minimized Content */}
+                        {!isExpanded && (
+                             <div className="flex justify-between items-center h-full pb-2">
+                                 <span className="text-xs font-bold uppercase truncate pr-4">{selectedProject.title}</span>
+                                 <button onClick={() => setIsPlaying(!isPlaying)} className="uppercase text-[10px] font-bold whitespace-nowrap">{isPlaying ? 'PAUSE' : 'PLAY'}</button>
+                             </div>
+                        )}
+                     </div>
+
+                     {/* Expanded Waveform (Absolute behind everything) */}
+                     {isExpanded && (
+                        <div 
+                            className="absolute inset-x-0 bottom-0 h-20 z-10 touch-none"
+                            onTouchStart={handleScrub}
+                            onTouchMove={handleScrub}
+                            onClick={handleScrub}
+                        >
+                            <canvas ref={canvasRef} className="w-full h-full opacity-50" />
+                        </div>
+                     )}
+                </div>
+            )
+        }
+
+        const GeoGlobe = ({ targetLocation }) => {
+            const canvasRef = useRef(null);
+            const rotationRef = useRef(0);
+            const [geoData, setGeoData] = useState([]);
+            const { theme } = useContext(ThemeContext);
+            
+            const globeFrontOpacity = 0.90;
+            const globeBackOpacity = 0.49;
+
+            useEffect(() => {
+                fetch('https://raw.githubusercontent.com/nvkelso/natural-earth-vector/master/geojson/ne_110m_land.geojson')
+                    .then(r => r.json()).then(data => {
+                        const features = [];
+                        data.features.forEach(f => {
+                            if (f.geometry.type === 'Polygon') features.push(f.geometry.coordinates);
+                            else if (f.geometry.type === 'MultiPolygon') f.geometry.coordinates.forEach(p => features.push(p));
+                        });
+                        setGeoData(features);
+                    });
+            }, []);
+            
+            useEffect(() => {
+                const canvas = canvasRef.current;
+                if(!canvas) return;
+                const ctx = canvas.getContext('2d');
+                let animationId;
+
+                const render = () => {
+                    canvas.width = canvas.clientWidth;
+                    canvas.height = canvas.clientHeight;
+                    const w = canvas.width;
+                    const h = canvas.height;
+                    const r = Math.min(w, h) * 0.42; 
+                    const cx = w / 2;
+                    const cy = h / 2;
+
+                    if (targetLocation && cityCoords[targetLocation]) {
+                        const targetLng = cityCoords[targetLocation].lng;
+                        const targetRot = -targetLng * (Math.PI / 180);
+                        let diff = targetRot - rotationRef.current;
+                        while (diff > Math.PI) diff -= Math.PI * 2;
+                        while (diff < -Math.PI) diff += Math.PI * 2;
+                        rotationRef.current += diff * 0.08;
+                    } else {
+                        rotationRef.current += 0.005;
+                    }
+                    
+                    ctx.clearRect(0, 0, w, h);
+                    
+                    const project = (lat, lng) => {
+                        const phi = lat * (Math.PI / 180);
+                        const theta = lng * (Math.PI / 180) + rotationRef.current;
+                        const x = r * Math.cos(phi) * Math.sin(theta);
+                        const y = -r * Math.sin(phi);
+                        const z = r * Math.cos(phi) * Math.cos(theta);
+                        return { x: cx + x, y: cy + y, z };
+                    };
+
+                    const isRetro = theme === 'retro';
+                    ctx.lineWidth = 0.8;
+                    ctx.strokeStyle = isRetro ? '#888' : "#151515"; 
+                    ctx.lineJoin = 'round';
+
+                    // --- PASS 1: BACK LINES ---
+                    if (!isRetro) {
+                        ctx.beginPath();
+                        geoData.forEach(poly => {
+                            poly.forEach(ring => {
+                                for(let i=0; i<ring.length-1; i++) {
+                                    const p1 = project(ring[i][1], ring[i][0]);
+                                    const p2 = project(ring[i+1][1], ring[i+1][0]);
+                                    if (p1.z <= 0 || p2.z <= 0) {
+                                        if (p1.z <= 0 && p2.z <= 0) {
+                                            ctx.moveTo(p1.x, p1.y); ctx.lineTo(p2.x, p2.y);
+                                        } else {
+                                            const t = p1.z / (p1.z - p2.z);
+                                            const ix = p1.x + (p2.x - p1.x) * t;
+                                            const iy = p1.y + (p2.y - p1.y) * t;
+                                            if (p1.z <= 0) { ctx.moveTo(p1.x, p1.y); ctx.lineTo(ix, iy); }
+                                            else { ctx.moveTo(ix, iy); ctx.lineTo(p2.x, p2.y); }
+                                        }
+                                    }
+                                }
+                            });
+                        });
+                        ctx.globalAlpha = globeBackOpacity;
+                        ctx.stroke();
+                        ctx.globalAlpha = 1.0;
+                    }
+
+                    // --- PASS 2: SPHERE FILL (Translucent) ---
+                    ctx.fillStyle = isRetro ? '#000' : `rgba(255,255,255,${globeFrontOpacity})`;
+                    ctx.beginPath(); ctx.arc(cx, cy, r, 0, Math.PI * 2); ctx.fill();
+
+                    // --- PASS 3: FRONT LINES ---
+                    ctx.beginPath();
+                    geoData.forEach(poly => {
+                        poly.forEach(ring => {
+                            for(let i=0; i<ring.length-1; i++) {
+                                const p1 = project(ring[i][1], ring[i][0]);
+                                const p2 = project(ring[i+1][1], ring[i+1][0]);
+                                if (p1.z > 0 || p2.z > 0) {
+                                    if (p1.z > 0 && p2.z > 0) {
+                                        ctx.moveTo(p1.x, p1.y); ctx.lineTo(p2.x, p2.y);
+                                    } else {
+                                        const t = p1.z / (p1.z - p2.z);
+                                        const ix = p1.x + (p2.x - p1.x) * t;
+                                        const iy = p1.y + (p2.y - p1.y) * t;
+                                        if (p1.z > 0) { ctx.moveTo(p1.x, p1.y); ctx.lineTo(ix, iy); }
+                                        else { ctx.moveTo(ix, iy); ctx.lineTo(p2.x, p2.y); }
+                                    }
+                                }
+                            }
+                        });
+                    });
+                    ctx.stroke();
+
+                    // Globe Outline
+                    ctx.strokeStyle = "rgba(100,100,100,0.1)";
+                    ctx.lineWidth = 1;
+                    ctx.beginPath(); ctx.arc(cx, cy, r, 0, Math.PI * 2); ctx.stroke();
+
+                    if (targetLocation && cityCoords[targetLocation]) {
+                        const c = cityCoords[targetLocation];
+                        const pos = project(c.lat, c.lng);
+                        if (pos.z > 0 || globeFrontOpacity < 0.8) {
+                            const pinColor = isRetro ? '#FFF' : '#151515';
+                            ctx.fillStyle = pinColor;
+                            ctx.strokeStyle = pinColor;
+                            
+                            // UPDATED PIN SIZES FOR MOBILE/DESKTOP UNIFORMITY
+                            ctx.beginPath(); ctx.arc(pos.x, pos.y, 3.7, 0, Math.PI*2); ctx.fill(); 
+                            ctx.lineWidth = 0.8;
+                            ctx.beginPath(); ctx.arc(pos.x, pos.y, 5.5, 0, Math.PI*2); ctx.stroke(); 
+                        }
+                    }
+                    animationId = requestAnimationFrame(render);
+                };
+                render();
+                return () => cancelAnimationFrame(animationId);
+            }, [targetLocation, geoData, theme]);
+
+            return (
+                <div className="w-full h-full relative flex flex-col">
+                    <div className="flex-1 relative">
+                        <canvas ref={canvasRef} className="w-full h-full" />
+                    </div>
+                </div>
+            );
+        };
+
+        const AppContent = () => {
+            const [selectedProject, setSelectedProject] = useState(null);
+            const [filterLocation, setFilterLocation] = useState(null);
+            const [time, setTime] = useState("");
+            const [isPlaying, setIsPlaying] = useState(false);
+            const [activeSlide, setActiveSlide] = useState(0); 
+            const [currentView, setCurrentView] = useState('home'); 
+            const [progress, setProgress] = useState(0);
+            const duration = 225;
+
+            // Swipe State
+            const [touchStart, setTouchStart] = useState(null);
+            const [touchEnd, setTouchEnd] = useState(null);
+            
+            const itemRefs = useRef({});
+            const { theme, toggleTheme } = useContext(ThemeContext);
+            const unselectedColor = '#545454';
+
+            // Global Progress Interval
+            useEffect(() => {
+                let interval;
+                if (isPlaying) {
+                    interval = setInterval(() => setProgress(p => p >= 100 ? 0 : p + 0.1), 100);
+                }
+                return () => clearInterval(interval);
+            }, [isPlaying]);
+
+            useEffect(() => setProgress(0), [selectedProject]);
+
+            useEffect(() => {
+                const timer = setInterval(() => {
+                    setTime(new Date().toLocaleTimeString('en-US', { hour12: true, hour: 'numeric', minute: '2-digit', second: '2-digit' }));
+                }, 1000);
+                return () => clearInterval(timer);
+            }, []);
+
+            const filteredProjects = useMemo(() => {
+                if (filterLocation) return projectsData.filter(p => p.location === filterLocation);
+                return projectsData;
+            }, [filterLocation]);
+
+            useEffect(() => {
+                if (selectedProject && itemRefs.current[selectedProject.id]) {
+                    itemRefs.current[selectedProject.id].scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+                }
+            }, [selectedProject]);
+
+            useEffect(() => {
+                const handleKey = (e) => {
+                    if (currentView !== 'home') return;
+                    if (e.key === 'ArrowRight') handleNavigation('next');
+                    if (e.key === 'ArrowLeft') handleNavigation('prev');
+                };
+                window.addEventListener('keydown', handleKey);
+                return () => window.removeEventListener('keydown', handleKey);
+            }, [selectedProject, currentView, filteredProjects]);
+
+            const handleProjectClick = (p) => {
+                setCurrentView('home'); 
+                if (selectedProject?.id === p.id) { setSelectedProject(null); setIsPlaying(false); }
+                else { setSelectedProject(p); setIsPlaying(true); }
+            };
+
+            const handleNavigation = (dir) => {
+                const list = filteredProjects;
+                if (!list.length) return;
+                let idx = selectedProject ? list.findIndex(p => p.id === selectedProject.id) : -1;
+                let newIdx = dir === 'next' ? (idx + 1) % list.length : (idx - 1 + list.length) % list.length;
+                setSelectedProject(list[newIdx]);
+                setIsPlaying(true);
+            };
+
+            const menuItems = [
+                {id: 'search', label: 'Search'},
+                {id: 'projects', label: 'Projects'},
+                {id: 'music', label: 'Music'},
+                {id: 'drumpacks', label: 'Drum Packs'},
+                {id: 'merch', label: 'Merch'},
+                {id: 'tentools', label: 'TenTools', disabled: true},
+            ];
+
+            // Swipe Handlers
+            const onTouchStart = (e) => {
+                setTouchEnd(null);
+                setTouchStart(e.targetTouches[0].clientX);
+            };
+
+            const onTouchMove = (e) => {
+                setTouchEnd(e.targetTouches[0].clientX);
+            };
+
+            const onTouchEnd = () => {
+                if (!touchStart || !touchEnd) return;
+                const distance = touchStart - touchEnd;
+                const isLeftSwipe = distance > 50;
+                const isRightSwipe = distance < -50;
+                if (isLeftSwipe) {
+                    // Next Slide
+                    setActiveSlide(prev => (prev + 1) % 5); // 5 is slide count
+                }
+                if (isRightSwipe) {
+                    // Prev Slide (Simple wrap for now)
+                    setActiveSlide(prev => (prev === 0 ? 4 : prev - 1));
+                }
+            };
+
+            const renderMiddleColumn = () => {
+                if (currentView === 'search') return <DummyLoader title="SEARCH" type="search" />;
+                if (currentView === 'projects') return <DummyLoader title="ALL PROJECTS" subtext="FETCHING ARCHIVE..." />;
+                if (currentView === 'music' || currentView === 'drumpacks') return <DummyLoader title={currentView === 'music' ? "MUSIC LIBRARY" : "DRUM KITS"} subtext="FETCHING ASSETS..." />;
+                if (currentView === 'merch') return <DummyLoader title="MERCH" type="merch" />;
+                if (currentView === 'upload') return <UploadUI />;
+
+                if (!selectedProject) return (
+                    <div className="flex-1 flex flex-col items-center justify-center h-full min-h-[300px] lg:min-h-0">
+                        <div className="text-xl uppercase font-bold tracking-widest flex items-center gap-2 font-mono">
+                            AWAITING INPUT <span className="w-3 h-5 bg-current animate-pulse block"></span>
+                        </div>
+                    </div>
+                );
+
+                const slides = [
+                    <div className="text-center z-10 w-full px-12 animate-in fade-in">
+                        <div className="text-[10px] mb-4 flex justify-between w-full uppercase opacity-60"><span>{selectedProject.type}</span><span>2025</span></div>
+                        <div className="text-3xl lg:text-5xl mb-2 font-medium tracking-tight uppercase leading-none">{selectedProject.title}</div>
+                        <div className="text-sm uppercase tracking-wide border-b border-current inline-block pb-1">{selectedProject.artist}</div>
+                    </div>,
+                    <div className="w-full h-full p-4 flex items-center justify-center animate-in fade-in">
+                        <div className={`w-full h-full flex items-center justify-center border border-current overflow-hidden relative ${theme === 'retro' ? 'bg-[#050505]' : 'bg-gray-200'}`}>
+                            <img src={`https://source.unsplash.com/random/800x600?abstract&sig=${selectedProject.id}`} className="object-cover w-full h-full grayscale" />
+                            <div className="absolute bottom-2 right-2 bg-black text-white px-2 text-xs z-20">IMG_01.JPG</div>
+                        </div>
+                    </div>,
+                    <div className="w-full h-full p-8 flex items-start justify-start animate-in fade-in">
+                        <div className="font-mono text-xs leading-relaxed opacity-80">
+                            <div className="mb-4 font-bold border-b border-current pb-2 w-full">NOTES.TXT // {selectedProject.title}</div>
+                            <p>Initial session recorded in {selectedProject.location}.</p>
+                            <p className="mt-2">Signal flow: Analog heat -> Digital freeze. Texture derived from a VHS tape found in the attic. Re-sampled at 12-bit.</p>
+                            <p className="mt-4 text-[10px] opacity-50">-- END OF FILE --</p>
+                        </div>
+                    </div>,
+                    <div className="w-full h-full p-4 flex items-center justify-center animate-in fade-in">
+                        <div className={`w-full h-full flex items-center justify-center border border-current overflow-hidden relative ${theme === 'retro' ? 'bg-[#050505]' : 'bg-gray-200'}`}>
+                            <img src={`https://source.unsplash.com/random/800x600?texture&sig=${selectedProject.id + 10}`} className="object-cover w-full h-full grayscale contrast-125" />
+                            <div className="absolute bottom-2 right-2 bg-black text-white px-2 text-xs">REF_02.PNG</div>
+                        </div>
+                    </div>,
+                    <div className="w-full h-full flex flex-col items-center justify-center animate-in fade-in">
+                         <span className="material-symbols-outlined text-6xl opacity-20 mb-4">folder_zip</span>
+                         <div className="text-sm font-bold uppercase">STEMS_V3.ZIP</div>
+                         <div className="text-xs opacity-60 mt-1">452 MB // 24 Items</div>
+                         <button className={`mt-4 border px-4 py-2 uppercase text-xs transition-colors
+                            ${theme === 'retro' ? 'border-current hover:bg-current hover:text-[#Eae9e5]' : 'border-black text-black hover:bg-black hover:text-white'}`}>
+                            Download Pack
+                        </button>
+                    </div>
+                ];
+
+                return (
+                    <div 
+                        className={`flex-1 relative flex flex-col justify-center items-center cursor-pointer h-full min-h-[350px] group select-none ${theme === 'retro' ? '' : 'bg-[#FAFAFA]'}`} 
+                        onClick={() => setActiveSlide((prev) => (prev + 1) % slides.length)}
+                        onTouchStart={onTouchStart}
+                        onTouchMove={onTouchMove}
+                        onTouchEnd={onTouchEnd}
+                    >
+                        {slides[activeSlide]}
+                        <div className={`absolute bottom-6 left-1/2 -translate-x-1/2 flex items-center gap-2 px-3 py-1.5 backdrop-blur-sm z-20 border rounded-full transition-opacity duration-300 opacity-0 group-hover:opacity-100 ${theme === 'retro' ? 'border-[#444] bg-[#111]' : 'border-black/5 bg-white/80'}`}>
+                            {slides.map((_, idx) => (
+                                <button key={idx} onClick={(e) => { e.stopPropagation(); setActiveSlide(idx); }} className={`w-2 h-2 border border-current transition-all duration-300 rounded-full ${activeSlide === idx ? 'bg-current scale-110' : 'bg-transparent opacity-30'}`}></button>
+                            ))}
+                        </div>
+                    </div>
+                );
+            };
+
+            return (
+                <div className={`flex flex-col h-full w-full max-w-[1920px] mx-auto p-4 lg:p-0 ${theme === 'retro' ? 'lg:p-2' : ''}`}>
+                    
+                    {/* HEADER - Increased margin bottom on desktop for spacing */}
+                    <header className={`flex-none flex justify-between items-start mb-0 lg:mb-10 pt-2 pb-4 text-xs font-medium uppercase tracking-wide border-b border-transparent z-40 sticky top-0 transition-colors duration-300 ${theme === 'retro' ? 'bg-[#0F0F0F] lg:bg-transparent' : 'bg-white lg:bg-transparent'}`}>
+                        <div className="w-1/5 text-sm tracking-tight font-bold cursor-pointer" onClick={() => setCurrentView('home')}>noidle</div>
+                        
+                        {/* Desktop Nav */}
+                        <nav className="flex-1 text-center hidden lg:block">
+                            {menuItems.map(item => (
+                                <button key={item.id} onClick={() => !item.disabled && setCurrentView(item.id)} disabled={item.disabled}
+                                    className={`mx-3 font-normal transition-colors ${currentView === item.id ? 'text-current font-bold' : 'text-gray-400'} ${item.disabled ? 'opacity-30 cursor-not-allowed' : 'hover:text-current'}`}>
+                                    {item.label}
+                                </button>
+                            ))}
+                        </nav>
+                        
+                        <div className="w-auto lg:w-1/5 flex justify-end gap-6 items-center">
+                            <div className="hidden lg:flex items-center gap-2"><div className="w-2 h-2 bg-current rounded-full animate-pulse"></div><span>LIVE</span></div>
+                            <span className="hidden lg:inline">{time}</span>
+                            
+                            {/* Mobile Controls */}
+                            <div className="flex gap-2 lg:hidden">
+                                <button onClick={() => setCurrentView('upload')} className={`w-8 h-8 flex items-center justify-center border rounded-full transition-colors ${theme === 'retro' ? 'border-[#444]' : 'border-gray-200'}`}><span className="material-symbols-outlined text-sm">vpn_key</span></button>
+                                <button onClick={toggleTheme} className={`w-8 h-8 flex items-center justify-center border rounded-full transition-colors ${theme === 'retro' ? 'border-[#444]' : 'border-gray-200'}`}><span className="material-symbols-outlined text-sm">{theme === 'retro' ? 'wb_sunny' : 'contrast'}</span></button>
+                            </div>
+                        </div>
+                    </header>
+
+                    {/* MOBILE MENU (Sticky under Header) */}
+                    <div className={`flex lg:hidden overflow-x-auto no-scrollbar gap-2 pb-2 mb-4 z-30 sticky top-[58px] transition-colors duration-300 ${theme === 'retro' ? 'bg-[#0F0F0F]' : 'bg-white'}`}>
+                        {menuItems.map(item => (
+                            <button key={item.id} onClick={() => !item.disabled && setCurrentView(item.id)}
+                                className={`px-4 py-2 text-xs uppercase whitespace-nowrap border rounded-full transition-colors ${currentView === item.id ? (theme === 'retro' ? 'bg-[#555] border-transparent' : 'bg-black text-white') : (theme === 'retro' ? 'border-[#333] text-gray-400' : 'border-gray-200 text-gray-600')}`}>
+                                {item.label}
+                            </button>
+                        ))}
+                    </div>
+
+                    <div className="flex-1 flex flex-col min-h-0 z-10 pb-20 lg:pb-0">
+                        
+                        {/* MAIN LAYOUT */}
+                        <div className="flex-1 flex flex-col lg:flex-row gap-8 min-h-0 items-stretch lg:items-end">
+                            
+                            {/* COLUMN 1: Projects/Artists (Order 3 on Mobile) */}
+                            <div className="w-full lg:w-1/4 h-auto lg:h-full flex flex-col gap-4 min-h-0 order-3 lg:order-1">
+                                
+                                {/* Desktop Top Controls */}
+                                <div className="flex-none flex-col gap-1 hidden lg:flex">
+                                    {fixedArtistList.map(artist => (
+                                        <OscilloscopeText key={artist} text={artist} isActive={selectedProject?.artist === artist} 
+                                            onClick={() => {
+                                                const p = projectsData.find(proj => proj.artist === artist);
+                                                if(p) { handleProjectClick(p); setFilterLocation(null); }
+                                            }}
+                                        />
+                                    ))}
+                                    <button className={`mt-4 text-left text-xs uppercase border border-current rounded-full px-4 py-2 hover:bg-black hover:text-white transition-all w-fit ${theme === 'retro' ? 'hover:bg-white hover:text-black' : ''}`}>Join Waitlist</button>
+                                    <div className="flex gap-2 mt-2">
+                                        <button onClick={() => setCurrentView('upload')} className={`w-8 h-8 flex items-center justify-center border rounded-full transition-colors ${theme === 'retro' ? 'border-[#444] hover:bg-[#222]' : 'border-gray-200 hover:border-black'}`} title="Admin Upload"><span className="material-symbols-outlined text-sm">vpn_key</span></button>
+                                        <button onClick={toggleTheme} className={`w-8 h-8 flex items-center justify-center border rounded-full transition-colors ${theme === 'retro' ? 'border-[#444] hover:bg-[#222]' : 'border-gray-200 hover:border-black'}`} title="Toggle Dark Mode"><span className="material-symbols-outlined text-sm">{theme === 'retro' ? 'wb_sunny' : 'contrast'}</span></button>
+                                    </div>
+                                </div>
+
+                                {/* Project List (Scrollable on Mobile) */}
+                                <div className="flex-1 flex flex-col justify-end min-h-0">
+                                    <div className="flex-1 hidden lg:block"></div>
+                                    <div className="text-sm font-bold mb-2 lg:hidden uppercase opacity-50">Recent Projects</div>
+                                    <div className="lg:max-h-64 lg:overflow-y-auto no-scrollbar flex flex-col gap-2 lg:translate-y-[2px]">
+                                        {filteredProjects.map(p => (
+                                            <div key={p.id} ref={el => itemRefs.current[p.id] = el} onClick={() => handleProjectClick(p)}
+                                                className={`flex items-center gap-3 text-xs uppercase cursor-pointer group py-2 lg:py-1 shrink-0 ${selectedProject?.id === p.id ? 'font-bold' : 'hover:text-current'}`}
+                                                style={{ color: (selectedProject?.id !== p.id && theme !== 'retro') ? unselectedColor : undefined }}
+                                            >
+                                                <div className={`w-1.5 h-1.5 rounded-full ${selectedProject?.id === p.id ? 'bg-current' : 'bg-transparent border border-gray-400'}`}></div>
+                                                <div className="truncate"><span className="mr-2">{p.artist}</span><span className="opacity-50">— {p.title}</span></div>
+                                            </div>
+                                        ))}
+                                    </div>
+                                </div>
+                            </div>
+
+                            {/* COLUMN 2: Main Content (Sticky on Mobile, Order 2) */}
+                            <div className={`w-full lg:w-2/4 lg:h-full flex flex-col relative group border-2 border-transparent order-2 lg:order-2 aspect-square lg:aspect-auto sticky top-[110px] lg:static z-20 transition-colors duration-300 ${theme === 'retro' ? 'bg-[#0F0F0F] lg:bg-transparent' : 'bg-white lg:bg-transparent'}`}>
+                                {renderMiddleColumn()}
+                            </div>
+
+                            {/* COLUMN 3: Tools/Globe/Player (Order 1 for Menu, rest Hidden on Mobile) */}
+                            <div className="w-full lg:w-1/4 h-auto lg:h-full flex flex-col gap-4 order-1 lg:order-3">
+                                
+                                {/* Desktop Cities Filter */}
+                                <div className="flex-none flex-wrap gap-2 content-start hidden lg:flex">
+                                    {[...new Set(projectsData.map(p => p.location))].map(city => {
+                                        const isActive = filterLocation === city || (selectedProject?.location === city);
+                                        return (
+                                            <button key={city} onClick={() => setFilterLocation(city === filterLocation ? null : city)} 
+                                                className={`px-3 py-1 border rounded-full text-[10px] font-bold uppercase transition-all ${isActive ? (theme === 'retro' ? 'bg-[#C0C0C0] text-black border-transparent' : 'bg-black text-white border-black') : 'border-gray-200 hover:border-current hover:text-current bg-transparent'}`}
+                                                style={{ color: !isActive && theme !== 'retro' ? unselectedColor : undefined, borderColor: !isActive && theme !== 'retro' ? unselectedColor : undefined }}
+                                            >{city}</button>
+                                        );
+                                    })}
+                                    <button className="text-[10px] underline uppercase opacity-60 hover:opacity-100 ml-2">+ More</button>
+                                </div>
+
+                                {/* Globe (Hidden on Mobile) */}
+                                <div className="flex-1 min-h-0 items-center justify-center relative border border-transparent hidden lg:flex">
+                                    <GeoGlobe targetLocation={selectedProject?.location || filterLocation} />
+                                </div>
+
+                                {/* Desktop Player (Hidden on Mobile) */}
+                                <DesktopPlayer selectedProject={selectedProject} isPlaying={isPlaying} setIsPlaying={setIsPlaying} progress={progress} setProgress={setProgress} duration={duration} />
+                            </div>
+                        </div>
+
+                        {/* Desktop Footer Nav */}
+                        <div className="h-20 justify-center w-full pt-6 relative hidden lg:flex">
+                            <div className={`w-2/4 flex justify-between items-start px-0 font-mono text-xs uppercase border-t pt-4 ${theme === 'retro' ? 'border-[#333]' : 'border-gray-200'}`}>
+                                <div className="flex gap-4">
+                                    <button onClick={() => handleNavigation('prev')} className="hover:opacity-50 transition-opacity">← Prev</button>
+                                    <button onClick={() => handleNavigation('next')} className="hover:opacity-50 transition-opacity">Next →</button>
+                                </div>
+                                <div className="flex gap-8 opacity-60">
+                                    <span>{selectedProject?.artist || 'ARTIST'}</span>
+                                    <span>{selectedProject?.type || 'TYPE'}</span>
+                                    <span>{selectedProject?.location || 'LOC'}</span>
+                                    <span>2025</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    {/* Mobile Fixed Player */}
+                    <MobilePlayer selectedProject={selectedProject} isPlaying={isPlaying} setIsPlaying={setIsPlaying} progress={progress} setProgress={setProgress} />
+                </div>
+            );
+        };
+
+        function App() {
+            const [theme, setTheme] = useState('modern');
+            const toggleTheme = () => {
+                const ctx = new (window.AudioContext || window.webkitAudioContext)();
+                const osc = ctx.createOscillator();
+                const gain = ctx.createGain();
+                osc.connect(gain); gain.connect(ctx.destination);
+                osc.type = theme === 'modern' ? 'square' : 'sine';
+                osc.frequency.setValueAtTime(theme === 'modern' ? 220 : 440, ctx.currentTime);
+                gain.gain.setValueAtTime(0.1, ctx.currentTime);
+                osc.start(); gain.gain.exponentialRampToValueAtTime(0.00001, ctx.currentTime + 0.15); osc.stop(ctx.currentTime + 0.15);
+                setTheme(prev => prev === 'modern' ? 'retro' : 'modern');
+            };
+            return (
+                <ThemeContext.Provider value={{ theme, toggleTheme }}>
+                    <div className={`w-full h-full ${theme === 'retro' ? 'retro-mode' : ''}`}><AppContent /></div>
+                </ThemeContext.Provider>
+            );
+        }
+
+        const root = ReactDOM.createRoot(document.getElementById('root'));
+        root.render(<App />);
+    </script>
+</body>
+</html>
