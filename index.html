@@ -3,18 +3,28 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>NOIDLE // MASTER_SHIP_V7</title>
+    <title>NOIDLE // MASTER_SHIP_V7.2</title>
     
     <!-- FONTS -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=DM+Mono:ital,wght@0,300;0,400;0,500;1,300;1,400&family=Jersey+25&display=swap" rel="stylesheet">
+    <!-- System 7 style fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=VT323&family=Press+Start+2P&display=swap" rel="stylesheet">
+    <style>
+        @font-face {
+            font-family: 'Chicago';
+            src: local('Chicago'), local('Geneva'), local('Monaco');
+            font-weight: normal;
+            font-style: normal;
+        }
+    </style>
     
     <!-- ICONS -->
     <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20,300,0,0" rel="stylesheet" />
 
-    <!-- Tailwind -->
-    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Tailwind (Pinned Version) -->
+    <script src="https://cdn.tailwindcss.com?v=3.4.3"></script>
     
     <!-- Config -->
     <script>
@@ -36,10 +46,10 @@
         }
     </script>
 
-    <!-- React -->
-    <script crossorigin src="https://unpkg.com/react@18/umd/react.development.js"></script>
-    <script crossorigin src="https://unpkg.com/react-dom@18/umd/react-dom.development.js"></script>
-    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+    <!-- React & Babel (Pinned to stable versions to prevent random breaking changes) -->
+    <script crossorigin src="https://unpkg.com/react@18.3.1/umd/react.production.min.js"></script>
+    <script crossorigin src="https://unpkg.com/react-dom@18.3.1/umd/react-dom.production.min.js"></script>
+    <script crossorigin src="https://unpkg.com/@babel/standalone@7.24.7/babel.min.js"></script>
 
     <style>
         body {
@@ -53,7 +63,7 @@
         .no-scrollbar::-webkit-scrollbar { display: none; }
         .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
         
-        input[type=range] { -webkit-appearance: none; width: 100%; background: transparent; }
+        input[type=range] { -webkit-appearance: none; appearance: none; width: 100%; background: transparent; }
         input[type=range]::-webkit-slider-thumb {
             -webkit-appearance: none; height: 8px; width: 8px;
             background: currentColor; cursor: pointer;
@@ -62,50 +72,166 @@
         input[type=range]::-webkit-slider-runnable-track { width: 100%; height: 2px; cursor: pointer; background: transparent; }
         input[type=range]:focus { outline: none; }
 
-        /* --- DESKTOP RETRO MODE --- */
+        /* --- DESKTOP PALM PILOT DARK MODE --- */
         @media (min-width: 1024px) {
             .retro-mode {
-                background-color: #050505 !important;
-                color: #C0C0C0 !important;
-                font-family: "Jersey 25", sans-serif !important;
-                image-rendering: pixelated; 
-                -webkit-font-smoothing: none;
+                background-color: #0a0a0a !important;
+                color: #e0e0e0 !important;
+                font-family: "DM Mono", monospace !important;
+                -webkit-font-smoothing: antialiased;
+                image-rendering: pixelated;
             }
 
-            .retro-mode::after {
-                content: " ";
-                display: block;
-                position: absolute;
-                top: 0; left: 0; bottom: 0; right: 0;
-                background: linear-gradient(rgba(18, 16, 16, 0) 50%, rgba(0, 0, 0, 0.25) 50%);
-                background-size: 100% 4px;
-                z-index: 9999;
+            .retro-mode::before {
+                content: "";
+                position: fixed;
+                top: 0;
+                left: 0;
+                width: 100%;
+                height: 100%;
+                background: repeating-linear-gradient(
+                    0deg,
+                    rgba(255, 255, 255, 0.02) 0px,
+                    rgba(255, 255, 255, 0.02) 1px,
+                    transparent 1px,
+                    transparent 2px
+                );
                 pointer-events: none;
+                z-index: 9998;
             }
             
-            .retro-mode .border, .retro-mode .border-black, .retro-mode .border-gray, .retro-mode .border-current {
-                border-color: #444 !important;
-                border-radius: 0px !important;
+            .retro-mode button,
+            .retro-mode input,
+            .retro-mode select,
+            .retro-mode .rounded-sm,
+            .retro-mode .rounded-full,
+            .retro-mode .rounded-lg,
+            .retro-mode .rounded,
+            .retro-mode [class*="rounded"] {
+                border-radius: 0 !important;
             }
-            .retro-mode img { filter: grayscale(100%) contrast(150%) brightness(0.8); }
-            .retro-mode canvas { filter: invert(1) hue-rotate(180deg); opacity: 0.8; }
-            .retro-mode .text-xs { font-size: 16px !important; letter-spacing: 0.5px; }
-            .retro-mode .text-sm { font-size: 20px !important; }
-            .retro-mode .text-5xl { font-size: 56px !important; }
+            
+            .retro-mode .border, 
+            .retro-mode .border-black, 
+            .retro-mode .border-gray, 
+            .retro-mode .border-current {
+                border-color: #000000 !important;
+                border-width: 1px !important;
+                border-style: solid !important;
+            }
+            
+            .retro-mode button {
+                background-color: #1a1a1a !important;
+                color: #e0e0e0 !important;
+                border: 1px solid #000000 !important;
+                box-shadow: none !important;
+            }
+            
+            .retro-mode button:hover {
+                background-color: #2a2a2a !important;
+                border-color: #333333 !important;
+            }
+            
+            .retro-mode button:active {
+                background-color: #0a0a0a !important;
+                border-color: #000000 !important;
+            }
+            
+            .retro-mode input[type="text"],
+            .retro-mode input[type="search"],
+            .retro-mode select,
+            .retro-mode textarea {
+                border: 1px solid #000000 !important;
+                background: #0a0a0a !important;
+                color: #e0e0e0 !important;
+                padding: 4px !important;
+                font-family: "DM Mono", monospace !important;
+                -webkit-font-smoothing: antialiased !important;
+                box-shadow: none !important;
+            }
+            
+            .retro-mode input[type="text"]:focus,
+            .retro-mode input[type="search"]:focus,
+            .retro-mode select:focus,
+            .retro-mode textarea:focus {
+                outline: 1px solid #e0e0e0 !important;
+                outline-offset: -2px !important;
+                background: #1a1a1a !important;
+            }
+            
+            .retro-mode img { 
+                filter: grayscale(100%) contrast(200%) brightness(1.1) !important; 
+                image-rendering: pixelated !important;
+            }
+            
+            .retro-mode canvas { 
+                filter: none !important; 
+                opacity: 1 !important; 
+                image-rendering: pixelated !important;
+            }
+            
+            .retro-mode .text-xs { 
+                font-size: 11px !important; 
+                letter-spacing: 0.5px; 
+                font-weight: 400;
+            }
+            .retro-mode .text-sm { 
+                font-size: 13px !important; 
+            }
+            .retro-mode .text-5xl { 
+                font-size: 48px !important; 
+            }
+            
+            .retro-mode .bg-black { background-color: #000000 !important; }
+            .retro-mode .bg-white { background-color: #1a1a1a !important; }
+            .retro-mode .bg-gray-50, 
+            .retro-mode .bg-gray-100, 
+            .retro-mode .bg-gray-200 { 
+                background-color: #1a1a1a !important; 
+            }
+            .retro-mode .bg-gray-800, 
+            .retro-mode .bg-gray-900 { 
+                background-color: #0a0a0a !important; 
+            }
+            
+            .retro-mode .text-black { color: #e0e0e0 !important; }
+            .retro-mode .text-white { color: #ffffff !important; }
+            .retro-mode .text-gray-400, 
+            .retro-mode .text-gray-500 { 
+                color: #888888 !important; 
+            }
+            
+            .retro-mode,
+            .retro-mode * {
+                text-shadow: none !important;
+                box-shadow: none !important;
+            }
+            
+            .retro-mode button:hover {
+                box-shadow: none !important;
+            }
         }
 
-        /* --- MOBILE DESIGNER DARK MODE --- */
+        /* --- MOBILE DARK MODE --- */
         @media (max-width: 1023px) {
             .retro-mode {
-                background-color: #0F0F0F !important;
-                color: #F0F0F0 !important;
+                background-color: #1a1a1a !important;
+                color: #c0c0c0 !important;
             }
-            .retro-mode .border, .retro-mode .border-black {
+            .retro-mode .border, 
+            .retro-mode .border-black {
                 border-color: #333 !important;
             }
-            .retro-mode .bg-black { background-color: #222 !important; }
-            .retro-mode .text-black { color: #FFF !important; }
-            .retro-mode button.border-black { border-color: #555 !important; color: #FFF !important; }
+            .retro-mode .bg-black { 
+                background-color: #1a1a1a !important; 
+            }
+            .retro-mode .text-black { 
+                color: #c0c0c0 !important; 
+            }
+            .retro-mode button.border-black { 
+                border-color: #555 !important; 
+                color: #c0c0c0 !important; 
+            }
         }
     </style>
 </head>
@@ -147,16 +273,18 @@
             useEffect(() => { if (textRef.current) setWidth(textRef.current.offsetWidth); }, [text]);
 
             useEffect(() => {
-                if (!isHovered || !width) return;
+                if (!isHovered || !width || width === 0) return;
                 const canvas = canvasRef.current;
+                if (!canvas) return;
                 const ctx = canvas.getContext('2d');
+                if (theme === 'retro') ctx.imageSmoothingEnabled = false;
                 let animationId;
                 let time = 0;
 
                 const render = () => {
                     ctx.clearRect(0, 0, width, 20);
                     ctx.beginPath();
-                    ctx.strokeStyle = theme === 'retro' ? '#C0C0C0' : "#151515"; 
+                    ctx.strokeStyle = theme === 'retro' ? '#e0e0e0' : "#151515"; 
                     ctx.lineWidth = 1.5;
                     for (let x = 0; x < width; x++) {
                         const normalizedX = x / width; 
@@ -195,10 +323,10 @@
 
             if (title === "SEARCH") return (
                 <div className="w-full h-full p-8 flex flex-col justify-center animate-in fade-in">
-                    <div className={`border-b-2 ${theme === 'retro' ? 'border-[#444]' : 'border-black'} w-full flex items-center gap-2 pb-2`}>
+                    <div className={`border-b-2 ${theme === 'retro' ? 'border-black' : 'border-black'} w-full flex items-center gap-2 pb-2`}>
                         <span className="material-symbols-outlined text-lg">search</span>
                         <input type="text" autoFocus className="w-full bg-transparent outline-none uppercase font-mono text-xl placeholder-gray-500" placeholder="SEARCH DATABASE..." />
-                        <div className={`w-2 h-6 ${theme === 'retro' ? 'bg-[#C0C0C0]' : 'bg-black'} animate-pulse`}></div>
+                        <div className={`w-2 h-6 ${theme === 'retro' ? 'bg-[#e0e0e0]' : 'bg-black'} animate-pulse`}></div>
                     </div>
                 </div>
             );
@@ -211,16 +339,16 @@
             );
             return (
                 <div className="w-full h-full p-6 flex flex-col animate-in fade-in bg-inherit">
-                    <div className={`flex justify-between items-end mb-4 border-b ${theme === 'retro' ? 'border-[#444]' : 'border-gray-200'} pb-2`}>
+                    <div className={`flex justify-between items-end mb-4 border-b ${theme === 'retro' ? 'border-black' : 'border-gray-200'} pb-2`}>
                         <h2 className="text-xl uppercase tracking-tight">{title}</h2>
                         <span className="text-[10px] uppercase text-gray-500 animate-pulse">{subtext || "LOADING..."}</span>
                     </div>
                     <div className="grid grid-cols-3 gap-4 h-full">
                         {bars.map((width, i) => (
-                            <div key={i} className={`w-full h-full relative overflow-hidden flex flex-col justify-end p-2 ${theme === 'retro' ? 'border border-[#444] bg-[#050505]' : 'bg-gray-50'}`}>
+                            <div key={i} className={`w-full h-full relative overflow-hidden flex flex-col justify-end p-2 ${theme === 'retro' ? 'border border-black bg-[#1a1a1a]' : 'bg-gray-50'}`}>
                                 <div className="absolute top-2 left-2 text-[10px] opacity-50">FILE_{100 + i}.DAT</div>
                                 <div className={`h-2 w-full border border-current bg-transparent`}>
-                                    <div className={`h-full transition-all duration-[5000ms] ease-linear w-0 ${theme === 'retro' ? 'bg-[#C0C0C0]' : 'bg-black'}`} ref={el => { if(el) setTimeout(() => el.style.width = `${width}%`, 100); }}></div>
+                                    <div className={`h-full transition-all duration-[5000ms] ease-linear w-0 ${theme === 'retro' ? 'bg-[#e0e0e0]' : 'bg-black'}`} ref={el => { if(el) setTimeout(() => el.style.width = `${width}%`, 100); }}></div>
                                 </div>
                             </div>
                         ))}
@@ -234,9 +362,9 @@
             const inputClass = "border-b border-gray-300 p-2 bg-transparent text-sm outline-none focus:border-current transition-colors w-full";
             return (
                 <div className="w-full h-full p-8 flex flex-col animate-in fade-in">
-                    <div className={`border-b ${theme === 'retro' ? 'border-[#444]' : 'border-black'} pb-2 mb-6 flex justify-between items-center`}>
+                    <div className={`border-b ${theme === 'retro' ? 'border-black' : 'border-black'} pb-2 mb-6 flex justify-between items-center`}>
                         <h2 className="text-xl uppercase font-bold">Cabin Upload</h2>
-                        <span className={`text-[10px] px-1 ${theme === 'retro' ? 'bg-[#C0C0C0] text-black' : 'bg-black text-white'}`}>ADMIN</span>
+                        <span className={`text-[10px] px-1 ${theme === 'retro' ? 'bg-[#1a1a1a] text-[#e0e0e0]' : 'bg-black text-white'}`}>ADMIN</span>
                     </div>
                     <div className="flex-1 flex flex-col gap-6">
                         <div className="flex gap-4">
@@ -250,11 +378,11 @@
                             </div>
                         </div>
                         <div><label className="text-[10px] uppercase font-bold opacity-60">Project Title</label><input type="text" className={inputClass} placeholder="ENTER TITLE" /></div>
-                        <div className={`flex-1 border-2 border-dashed rounded-lg flex items-center justify-center cursor-pointer transition-all hover:opacity-100 opacity-60 ${theme === 'retro' ? 'border-[#444] hover:bg-[#222]' : 'border-gray-300 hover:border-black hover:bg-gray-50'}`}>
+                        <div className={`flex-1 border-2 border-dashed flex items-center justify-center cursor-pointer transition-all hover:opacity-100 opacity-60 ${theme === 'retro' ? 'border-black hover:bg-[#1a1a1a]' : 'border-gray-300 hover:border-black hover:bg-gray-50'}`}>
                              <div className="text-center"><span className="material-symbols-outlined mb-2">cloud_upload</span><div className="text-xs font-bold">DROP FILES HERE</div><div className="text-[10px] mt-1">WAV, PNG, JPG, TXT, MP4</div></div>
                         </div>
                         <div className="flex justify-end">
-                            <button className={`py-3 px-6 uppercase text-xs font-bold transition-colors ${theme === 'retro' ? 'bg-[#C0C0C0] text-black hover:bg-white' : 'bg-black text-white hover:bg-gray-800'}`}>Submit to Database</button>
+                            <button className={`py-3 px-6 uppercase text-xs font-bold transition-colors ${theme === 'retro' ? '' : 'bg-black text-white hover:bg-gray-800'}`}>Submit to Database</button>
                         </div>
                     </div>
                 </div>
@@ -268,7 +396,9 @@
 
             useEffect(() => {
                 const canvas = canvasRef.current;
+                if (!canvas) return;
                 const ctx = canvas.getContext('2d');
+                if (theme === 'retro') ctx.imageSmoothingEnabled = false;
                 let animationId;
                 let time = 0;
 
@@ -279,10 +409,16 @@
                     }
                     const w = canvas.width;
                     const h = canvas.height;
+                    
+                    if (w === 0 || h === 0) {
+                        animationId = requestAnimationFrame(render);
+                        return;
+                    }
+
                     const cy = h / 2;
 
-                    const bg = isInverted ? (theme === 'retro' ? '#C0C0C0' : '#151515') : (theme === 'retro' ? '#111' : '#FFFFFF');
-                    const fg = isInverted ? (theme === 'retro' ? '#111' : '#FFFFFF') : (theme === 'retro' ? '#C0C0C0' : '#151515');
+                    const bg = isInverted ? (theme === 'retro' ? '#1a1a1a' : '#151515') : (theme === 'retro' ? '#0a0a0a' : '#FFFFFF');
+                    const fg = isInverted ? (theme === 'retro' ? '#0a0a0a' : '#FFFFFF') : (theme === 'retro' ? '#e0e0e0' : '#151515');
                     
                     ctx.fillStyle = bg;
                     ctx.fillRect(0, 0, w, h);
@@ -324,7 +460,7 @@
             const containerClass = isInverted ? "bg-black text-white border-white" : "bg-white text-black border-black";
             const trackColor = isInverted ? 'bg-gray-800' : 'bg-gray-200';
             const fillColor = isInverted ? 'bg-white' : 'bg-black';
-            const retroClass = theme === 'retro' ? 'border-[#444] bg-[#111]' : containerClass;
+            const retroClass = theme === 'retro' ? 'border-black bg-[#1a1a1a]' : containerClass;
 
             return (
                 <div className="flex-none flex-col justify-end hidden lg:flex">
@@ -336,19 +472,19 @@
                             </div>
                             <div>{formatTime((progress/100) * duration)} / {formatTime(duration)}</div>
                         </div>
-                        <div className={`relative border rounded-sm overflow-hidden ${theme === 'retro' ? 'border-[#444]' : (isInverted ? 'border-white' : 'border-black')}`}>
+                        <div className={`relative border overflow-hidden ${theme === 'retro' ? 'border-black' : (isInverted ? 'border-white' : 'border-black')}`}>
                             <div className="h-20 w-full relative">
                                 <canvas ref={canvasRef} className="w-full h-full relative z-10" />
-                                <button onClick={() => setIsInverted(!isInverted)} className={`absolute top-1 right-1 z-20 text-[8px] px-1 border font-bold uppercase cursor-pointer ${theme === 'retro' ? 'border-current text-current bg-transparent' : (isInverted ? 'border-white text-white' : 'border-black text-black')}`}>INV</button>
+                                <button onClick={() => setIsInverted(!isInverted)} className={`absolute top-1 right-1 z-20 text-[8px] px-1 border font-bold uppercase cursor-pointer ${theme === 'retro' ? 'border-black text-[#e0e0e0] bg-[#1a1a1a]' : (isInverted ? 'border-white text-white' : 'border-black text-black')}`}>INV</button>
                             </div>
-                            <div className={`h-2 w-full relative border-t ${theme === 'retro' ? 'bg-[#222] border-[#444]' : `${trackColor} ${isInverted ? 'border-gray-700' : 'border-gray-300'}`}`}>
-                                <div className={`h-full ${theme === 'retro' ? 'bg-[#C0C0C0]' : fillColor}`} style={{width: `${progress}%`}}></div>
+                            <div className={`h-2 w-full relative border-t ${theme === 'retro' ? 'bg-[#0a0a0a] border-black' : `${trackColor} ${isInverted ? 'border-gray-700' : 'border-gray-300'}`}`}>
+                                <div className={`h-full ${theme === 'retro' ? 'bg-[#e0e0e0]' : fillColor}`} style={{width: `${progress}%`}}></div>
                                 <input type="range" min="0" max="100" step="0.1" value={progress} onChange={(e) => setProgress(Number(e.target.value))} className="absolute inset-0 w-full h-full opacity-0 cursor-pointer z-30" />
                             </div>
                         </div>
                         <div className="flex justify-between items-center mt-2 text-xs font-mono">
                             <div className="uppercase w-32 truncate font-bold">{selectedProject ? selectedProject.title : "No Track"}</div>
-                            <button className={`border px-2 py-0.5 uppercase text-[10px] ${theme === 'retro' ? 'border-[#444] hover:bg-[#C0C0C0] hover:text-black' : (isInverted ? 'border-white hover:bg-white hover:text-black' : 'border-black hover:bg-black hover:text-white')}`} onClick={() => setIsPlaying(!isPlaying)}>{isPlaying ? 'PAUSE' : 'PLAY'}</button>
+                            <button className={`border px-2 py-0.5 uppercase text-[10px] ${theme === 'retro' ? '' : (isInverted ? 'border-white hover:bg-white hover:text-black' : 'border-black hover:bg-black hover:text-white')}`} onClick={() => setIsPlaying(!isPlaying)}>{isPlaying ? 'PAUSE' : 'PLAY'}</button>
                         </div>
                     </div>
                 </div>
@@ -360,7 +496,6 @@
             const [isExpanded, setIsExpanded] = useState(false);
             const canvasRef = useRef(null);
 
-            // Handle scrubbing via drag on the expanded player
             const handleScrub = (e) => {
                 if (!canvasRef.current) return;
                 const rect = canvasRef.current.getBoundingClientRect();
@@ -376,6 +511,7 @@
                 if (!isExpanded || !canvasRef.current) return;
                 const canvas = canvasRef.current;
                 const ctx = canvas.getContext('2d');
+                if (theme === 'retro') ctx.imageSmoothingEnabled = false;
                 let animationId;
                 let time = 0;
 
@@ -386,12 +522,17 @@
                     }
                     const w = canvas.width;
                     const h = canvas.height;
+                    
+                    if (w === 0 || h === 0) {
+                        animationId = requestAnimationFrame(render);
+                        return;
+                    }
+
                     const cy = h / 2;
 
                     ctx.clearRect(0,0,w,h);
                     ctx.lineWidth = 1;
-                    // Use a subtle color based on theme
-                    ctx.strokeStyle = theme === 'retro' ? "rgba(255,255,255,0.3)" : "rgba(0,0,0,0.15)";
+                    ctx.strokeStyle = theme === 'retro' ? "rgba(224,224,224,0.6)" : "rgba(0,0,0,0.15)";
                     ctx.beginPath();
                     
                     if (!isPlaying) {
@@ -417,23 +558,20 @@
             return (
                 <div className={`fixed bottom-0 left-0 right-0 z-50 lg:hidden border-t transition-all duration-300 ${theme === 'retro' ? 'bg-[#0F0F0F] border-[#333]' : 'bg-white border-black'} ${isExpanded ? 'h-32' : 'h-14'}`}>
                      
-                     {/* Minimized: Full Width Progress Bar at Bottom */}
                      {!isExpanded && (
                          <div className="absolute bottom-0 left-0 w-full h-1.5 bg-gray-100 dark:bg-gray-800 z-20">
                              <div 
-                                className={`h-full transition-all duration-100 ${theme === 'retro' ? 'bg-[#C0C0C0]' : 'bg-black'}`} 
+                                className={`h-full transition-all duration-100 ${theme === 'retro' ? 'bg-[#e0e0e0]' : 'bg-black'}`} 
                                 style={{width: `${progress}%`}}
                              ></div>
                          </div>
                      )}
 
-                     {/* Content Wrapper (Padded) */}
                      <div className="px-4 pb-4 pt-2 w-full h-full flex flex-col relative z-30">
                         <div className="flex justify-center -mt-2 mb-2" onClick={() => setIsExpanded(!isExpanded)}>
                              <span className="material-symbols-outlined text-sm cursor-pointer opacity-50">{isExpanded ? 'expand_more' : 'expand_less'}</span>
                         </div>
                         
-                        {/* Expanded: Interactive Waveform for Scrubbing */}
                         {isExpanded && (
                             <div className="flex flex-col gap-3 relative z-10 pointer-events-none">
                                 <div className="flex justify-between items-center pointer-events-auto">
@@ -449,12 +587,11 @@
                                     </button>
                                 </div>
                                 <div className="w-full h-1 bg-gray-200 dark:bg-gray-800 relative">
-                                    <div className={`h-full absolute left-0 top-0 transition-all duration-100 ${theme === 'retro' ? 'bg-white' : 'bg-black'}`} style={{width: `${progress}%`}}></div>
+                                    <div className={`h-full absolute left-0 top-0 transition-all duration-100 ${theme === 'retro' ? 'bg-[#e0e0e0]' : 'bg-black'}`} style={{width: `${progress}%`}}></div>
                                 </div>
                             </div>
                         )}
                         
-                        {/* Minimized Content */}
                         {!isExpanded && (
                              <div className="flex justify-between items-center h-full pb-2">
                                  <span className="text-xs font-bold uppercase truncate pr-4">{selectedProject.title}</span>
@@ -463,7 +600,6 @@
                         )}
                      </div>
 
-                     {/* Expanded Waveform (Absolute behind everything) */}
                      {isExpanded && (
                         <div 
                             className="absolute inset-x-0 bottom-0 h-20 z-10 touch-none"
@@ -488,14 +624,22 @@
             const globeBackOpacity = 0.49;
 
             useEffect(() => {
+                // Handled API Failure properly to avoid white-screen crashes
                 fetch('https://raw.githubusercontent.com/nvkelso/natural-earth-vector/master/geojson/ne_110m_land.geojson')
-                    .then(r => r.json()).then(data => {
+                    .then(r => {
+                        if (!r.ok) throw new Error('Network response not ok');
+                        return r.json();
+                    })
+                    .then(data => {
                         const features = [];
                         data.features.forEach(f => {
                             if (f.geometry.type === 'Polygon') features.push(f.geometry.coordinates);
                             else if (f.geometry.type === 'MultiPolygon') f.geometry.coordinates.forEach(p => features.push(p));
                         });
                         setGeoData(features);
+                    })
+                    .catch(err => {
+                        console.warn('Map boundary data failed to load - skipping geometry rendering:', err);
                     });
             }, []);
             
@@ -503,6 +647,7 @@
                 const canvas = canvasRef.current;
                 if(!canvas) return;
                 const ctx = canvas.getContext('2d');
+                ctx.imageSmoothingEnabled = false;
                 let animationId;
 
                 const render = () => {
@@ -510,6 +655,12 @@
                     canvas.height = canvas.clientHeight;
                     const w = canvas.width;
                     const h = canvas.height;
+                    
+                    if (w === 0 || h === 0) {
+                        animationId = requestAnimationFrame(render);
+                        return;
+                    }
+
                     const r = Math.min(w, h) * 0.42; 
                     const cx = w / 2;
                     const cy = h / 2;
@@ -538,11 +689,11 @@
 
                     const isRetro = theme === 'retro';
                     ctx.lineWidth = 0.8;
-                    ctx.strokeStyle = isRetro ? '#888' : "#151515"; 
+                    ctx.strokeStyle = isRetro ? '#888888' : "#151515"; 
                     ctx.lineJoin = 'round';
 
                     // --- PASS 1: BACK LINES ---
-                    if (!isRetro) {
+                    if (!isRetro && geoData.length > 0) {
                         ctx.beginPath();
                         geoData.forEach(poly => {
                             poly.forEach(ring => {
@@ -568,32 +719,34 @@
                         ctx.globalAlpha = 1.0;
                     }
 
-                    // --- PASS 2: SPHERE FILL (Translucent) ---
-                    ctx.fillStyle = isRetro ? '#000' : `rgba(255,255,255,${globeFrontOpacity})`;
+                    // --- PASS 2: SPHERE FILL ---
+                    ctx.fillStyle = isRetro ? '#1a1a1a' : `rgba(255,255,255,${globeFrontOpacity})`;
                     ctx.beginPath(); ctx.arc(cx, cy, r, 0, Math.PI * 2); ctx.fill();
 
                     // --- PASS 3: FRONT LINES ---
-                    ctx.beginPath();
-                    geoData.forEach(poly => {
-                        poly.forEach(ring => {
-                            for(let i=0; i<ring.length-1; i++) {
-                                const p1 = project(ring[i][1], ring[i][0]);
-                                const p2 = project(ring[i+1][1], ring[i+1][0]);
-                                if (p1.z > 0 || p2.z > 0) {
-                                    if (p1.z > 0 && p2.z > 0) {
-                                        ctx.moveTo(p1.x, p1.y); ctx.lineTo(p2.x, p2.y);
-                                    } else {
-                                        const t = p1.z / (p1.z - p2.z);
-                                        const ix = p1.x + (p2.x - p1.x) * t;
-                                        const iy = p1.y + (p2.y - p1.y) * t;
-                                        if (p1.z > 0) { ctx.moveTo(p1.x, p1.y); ctx.lineTo(ix, iy); }
-                                        else { ctx.moveTo(ix, iy); ctx.lineTo(p2.x, p2.y); }
+                    if (geoData.length > 0) {
+                        ctx.beginPath();
+                        geoData.forEach(poly => {
+                            poly.forEach(ring => {
+                                for(let i=0; i<ring.length-1; i++) {
+                                    const p1 = project(ring[i][1], ring[i][0]);
+                                    const p2 = project(ring[i+1][1], ring[i+1][0]);
+                                    if (p1.z > 0 || p2.z > 0) {
+                                        if (p1.z > 0 && p2.z > 0) {
+                                            ctx.moveTo(p1.x, p1.y); ctx.lineTo(p2.x, p2.y);
+                                        } else {
+                                            const t = p1.z / (p1.z - p2.z);
+                                            const ix = p1.x + (p2.x - p1.x) * t;
+                                            const iy = p1.y + (p2.y - p1.y) * t;
+                                            if (p1.z > 0) { ctx.moveTo(p1.x, p1.y); ctx.lineTo(ix, iy); }
+                                            else { ctx.moveTo(ix, iy); ctx.lineTo(p2.x, p2.y); }
+                                        }
                                     }
                                 }
-                            }
+                            });
                         });
-                    });
-                    ctx.stroke();
+                        ctx.stroke();
+                    }
 
                     // Globe Outline
                     ctx.strokeStyle = "rgba(100,100,100,0.1)";
@@ -604,11 +757,10 @@
                         const c = cityCoords[targetLocation];
                         const pos = project(c.lat, c.lng);
                         if (pos.z > 0 || globeFrontOpacity < 0.8) {
-                            const pinColor = isRetro ? '#FFF' : '#151515';
+                            const pinColor = isRetro ? '#e0e0e0' : '#151515';
                             ctx.fillStyle = pinColor;
                             ctx.strokeStyle = pinColor;
                             
-                            // UPDATED PIN SIZES FOR MOBILE/DESKTOP UNIFORMITY
                             ctx.beginPath(); ctx.arc(pos.x, pos.y, 3.7, 0, Math.PI*2); ctx.fill(); 
                             ctx.lineWidth = 0.8;
                             ctx.beginPath(); ctx.arc(pos.x, pos.y, 5.5, 0, Math.PI*2); ctx.stroke(); 
@@ -639,7 +791,6 @@
             const [progress, setProgress] = useState(0);
             const duration = 225;
 
-            // Swipe State
             const [touchStart, setTouchStart] = useState(null);
             const [touchEnd, setTouchEnd] = useState(null);
             
@@ -647,7 +798,6 @@
             const { theme, toggleTheme } = useContext(ThemeContext);
             const unselectedColor = '#545454';
 
-            // Global Progress Interval
             useEffect(() => {
                 let interval;
                 if (isPlaying) {
@@ -710,7 +860,6 @@
                 {id: 'tentools', label: 'TenTools', disabled: true},
             ];
 
-            // Swipe Handlers
             const onTouchStart = (e) => {
                 setTouchEnd(null);
                 setTouchStart(e.targetTouches[0].clientX);
@@ -725,14 +874,8 @@
                 const distance = touchStart - touchEnd;
                 const isLeftSwipe = distance > 50;
                 const isRightSwipe = distance < -50;
-                if (isLeftSwipe) {
-                    // Next Slide
-                    setActiveSlide(prev => (prev + 1) % 5); // 5 is slide count
-                }
-                if (isRightSwipe) {
-                    // Prev Slide (Simple wrap for now)
-                    setActiveSlide(prev => (prev === 0 ? 4 : prev - 1));
-                }
+                if (isLeftSwipe) setActiveSlide(prev => (prev + 1) % 5);
+                if (isRightSwipe) setActiveSlide(prev => (prev === 0 ? 4 : prev - 1));
             };
 
             const renderMiddleColumn = () => {
@@ -750,38 +893,39 @@
                     </div>
                 );
 
+                // Replaced broken Unsplash URLs with stable Picsum logic
                 const slides = [
-                    <div className="text-center z-10 w-full px-12 animate-in fade-in">
+                    <div key="slide-1" className="text-center z-10 w-full px-12 animate-in fade-in">
                         <div className="text-[10px] mb-4 flex justify-between w-full uppercase opacity-60"><span>{selectedProject.type}</span><span>2025</span></div>
                         <div className="text-3xl lg:text-5xl mb-2 font-medium tracking-tight uppercase leading-none">{selectedProject.title}</div>
                         <div className="text-sm uppercase tracking-wide border-b border-current inline-block pb-1">{selectedProject.artist}</div>
                     </div>,
-                    <div className="w-full h-full p-4 flex items-center justify-center animate-in fade-in">
-                        <div className={`w-full h-full flex items-center justify-center border border-current overflow-hidden relative ${theme === 'retro' ? 'bg-[#050505]' : 'bg-gray-200'}`}>
-                            <img src={`https://source.unsplash.com/random/800x600?abstract&sig=${selectedProject.id}`} className="object-cover w-full h-full grayscale" />
+                    <div key="slide-2" className="w-full h-full p-4 flex items-center justify-center animate-in fade-in">
+                        <div className={`w-full h-full flex items-center justify-center border border-current overflow-hidden relative ${theme === 'retro' ? 'bg-[#1a1a1a]' : 'bg-gray-200'}`}>
+                            <img crossOrigin="anonymous" src={`https://picsum.photos/seed/${selectedProject.id + 100}/800/600`} alt="Project visualization" className="object-cover w-full h-full grayscale" />
                             <div className="absolute bottom-2 right-2 bg-black text-white px-2 text-xs z-20">IMG_01.JPG</div>
                         </div>
                     </div>,
-                    <div className="w-full h-full p-8 flex items-start justify-start animate-in fade-in">
+                    <div key="slide-3" className="w-full h-full p-8 flex items-start justify-start animate-in fade-in">
                         <div className="font-mono text-xs leading-relaxed opacity-80">
                             <div className="mb-4 font-bold border-b border-current pb-2 w-full">NOTES.TXT // {selectedProject.title}</div>
                             <p>Initial session recorded in {selectedProject.location}.</p>
-                            <p className="mt-2">Signal flow: Analog heat -> Digital freeze. Texture derived from a VHS tape found in the attic. Re-sampled at 12-bit.</p>
+                            <p className="mt-2">Signal flow: Analog heat -&gt; Digital freeze. Texture derived from a VHS tape found in the attic. Re-sampled at 12-bit.</p>
                             <p className="mt-4 text-[10px] opacity-50">-- END OF FILE --</p>
                         </div>
                     </div>,
-                    <div className="w-full h-full p-4 flex items-center justify-center animate-in fade-in">
-                        <div className={`w-full h-full flex items-center justify-center border border-current overflow-hidden relative ${theme === 'retro' ? 'bg-[#050505]' : 'bg-gray-200'}`}>
-                            <img src={`https://source.unsplash.com/random/800x600?texture&sig=${selectedProject.id + 10}`} className="object-cover w-full h-full grayscale contrast-125" />
+                    <div key="slide-4" className="w-full h-full p-4 flex items-center justify-center animate-in fade-in">
+                        <div className={`w-full h-full flex items-center justify-center border border-current overflow-hidden relative ${theme === 'retro' ? 'bg-[#1a1a1a]' : 'bg-gray-200'}`}>
+                            <img crossOrigin="anonymous" src={`https://picsum.photos/seed/${selectedProject.id + 200}/800/600`} alt="Reference texture" className="object-cover w-full h-full grayscale contrast-125" />
                             <div className="absolute bottom-2 right-2 bg-black text-white px-2 text-xs">REF_02.PNG</div>
                         </div>
                     </div>,
-                    <div className="w-full h-full flex flex-col items-center justify-center animate-in fade-in">
+                    <div key="slide-5" className="w-full h-full flex flex-col items-center justify-center animate-in fade-in">
                          <span className="material-symbols-outlined text-6xl opacity-20 mb-4">folder_zip</span>
                          <div className="text-sm font-bold uppercase">STEMS_V3.ZIP</div>
                          <div className="text-xs opacity-60 mt-1">452 MB // 24 Items</div>
                          <button className={`mt-4 border px-4 py-2 uppercase text-xs transition-colors
-                            ${theme === 'retro' ? 'border-current hover:bg-current hover:text-[#Eae9e5]' : 'border-black text-black hover:bg-black hover:text-white'}`}>
+                            ${theme === 'retro' ? '' : 'border-black text-black hover:bg-black hover:text-white'}`}>
                             Download Pack
                         </button>
                     </div>
@@ -796,9 +940,9 @@
                         onTouchEnd={onTouchEnd}
                     >
                         {slides[activeSlide]}
-                        <div className={`absolute bottom-6 left-1/2 -translate-x-1/2 flex items-center gap-2 px-3 py-1.5 backdrop-blur-sm z-20 border rounded-full transition-opacity duration-300 opacity-0 group-hover:opacity-100 ${theme === 'retro' ? 'border-[#444] bg-[#111]' : 'border-black/5 bg-white/80'}`}>
+                        <div className={`absolute bottom-6 left-1/2 -translate-x-1/2 flex items-center gap-2 px-3 py-1.5 backdrop-blur-sm z-20 border transition-opacity duration-300 opacity-0 group-hover:opacity-100 ${theme === 'retro' ? 'border-black bg-[#1a1a1a]' : 'border-black/5 bg-white/80'}`}>
                             {slides.map((_, idx) => (
-                                <button key={idx} onClick={(e) => { e.stopPropagation(); setActiveSlide(idx); }} className={`w-2 h-2 border border-current transition-all duration-300 rounded-full ${activeSlide === idx ? 'bg-current scale-110' : 'bg-transparent opacity-30'}`}></button>
+                                <button key={idx} onClick={(e) => { e.stopPropagation(); setActiveSlide(idx); }} className={`w-2 h-2 border border-current transition-all duration-300 ${activeSlide === idx ? 'bg-current scale-110' : 'bg-transparent opacity-30'}`}></button>
                             ))}
                         </div>
                     </div>
@@ -808,11 +952,9 @@
             return (
                 <div className={`flex flex-col h-full w-full max-w-[1920px] mx-auto p-4 lg:p-0 ${theme === 'retro' ? 'lg:p-2' : ''}`}>
                     
-                    {/* HEADER - Increased margin bottom on desktop for spacing */}
-                    <header className={`flex-none flex justify-between items-start mb-0 lg:mb-10 pt-2 pb-4 text-xs font-medium uppercase tracking-wide border-b border-transparent z-40 sticky top-0 transition-colors duration-300 ${theme === 'retro' ? 'bg-[#0F0F0F] lg:bg-transparent' : 'bg-white lg:bg-transparent'}`}>
+                    <header className={`flex-none flex justify-between items-start mb-0 lg:mb-10 pt-2 pb-4 text-xs font-medium uppercase tracking-wide border-b border-transparent z-40 sticky top-0 transition-colors duration-300 ${theme === 'retro' ? 'bg-[#0a0a0a] lg:bg-transparent' : 'bg-white lg:bg-transparent'}`}>
                         <div className="w-1/5 text-sm tracking-tight font-bold cursor-pointer" onClick={() => setCurrentView('home')}>noidle</div>
                         
-                        {/* Desktop Nav */}
                         <nav className="flex-1 text-center hidden lg:block">
                             {menuItems.map(item => (
                                 <button key={item.id} onClick={() => !item.disabled && setCurrentView(item.id)} disabled={item.disabled}
@@ -826,15 +968,13 @@
                             <div className="hidden lg:flex items-center gap-2"><div className="w-2 h-2 bg-current rounded-full animate-pulse"></div><span>LIVE</span></div>
                             <span className="hidden lg:inline">{time}</span>
                             
-                            {/* Mobile Controls */}
                             <div className="flex gap-2 lg:hidden">
-                                <button onClick={() => setCurrentView('upload')} className={`w-8 h-8 flex items-center justify-center border rounded-full transition-colors ${theme === 'retro' ? 'border-[#444]' : 'border-gray-200'}`}><span className="material-symbols-outlined text-sm">vpn_key</span></button>
-                                <button onClick={toggleTheme} className={`w-8 h-8 flex items-center justify-center border rounded-full transition-colors ${theme === 'retro' ? 'border-[#444]' : 'border-gray-200'}`}><span className="material-symbols-outlined text-sm">{theme === 'retro' ? 'wb_sunny' : 'contrast'}</span></button>
+                                <button onClick={() => setCurrentView('upload')} className={`w-8 h-8 flex items-center justify-center border rounded-full transition-colors ${theme === 'retro' ? 'border-black' : 'border-gray-200'}`}><span className="material-symbols-outlined text-sm">vpn_key</span></button>
+                                <button onClick={toggleTheme} className={`w-8 h-8 flex items-center justify-center border rounded-full transition-colors ${theme === 'retro' ? 'border-black' : 'border-gray-200'}`}><span className="material-symbols-outlined text-sm">{theme === 'retro' ? 'wb_sunny' : 'contrast'}</span></button>
                             </div>
                         </div>
                     </header>
 
-                    {/* MOBILE MENU (Sticky under Header) */}
                     <div className={`flex lg:hidden overflow-x-auto no-scrollbar gap-2 pb-2 mb-4 z-30 sticky top-[58px] transition-colors duration-300 ${theme === 'retro' ? 'bg-[#0F0F0F]' : 'bg-white'}`}>
                         {menuItems.map(item => (
                             <button key={item.id} onClick={() => !item.disabled && setCurrentView(item.id)}
@@ -845,14 +985,9 @@
                     </div>
 
                     <div className="flex-1 flex flex-col min-h-0 z-10 pb-20 lg:pb-0">
-                        
-                        {/* MAIN LAYOUT */}
                         <div className="flex-1 flex flex-col lg:flex-row gap-8 min-h-0 items-stretch lg:items-end">
                             
-                            {/* COLUMN 1: Projects/Artists (Order 3 on Mobile) */}
                             <div className="w-full lg:w-1/4 h-auto lg:h-full flex flex-col gap-4 min-h-0 order-3 lg:order-1">
-                                
-                                {/* Desktop Top Controls */}
                                 <div className="flex-none flex-col gap-1 hidden lg:flex">
                                     {fixedArtistList.map(artist => (
                                         <OscilloscopeText key={artist} text={artist} isActive={selectedProject?.artist === artist} 
@@ -864,12 +999,11 @@
                                     ))}
                                     <button className={`mt-4 text-left text-xs uppercase border border-current rounded-full px-4 py-2 hover:bg-black hover:text-white transition-all w-fit ${theme === 'retro' ? 'hover:bg-white hover:text-black' : ''}`}>Join Waitlist</button>
                                     <div className="flex gap-2 mt-2">
-                                        <button onClick={() => setCurrentView('upload')} className={`w-8 h-8 flex items-center justify-center border rounded-full transition-colors ${theme === 'retro' ? 'border-[#444] hover:bg-[#222]' : 'border-gray-200 hover:border-black'}`} title="Admin Upload"><span className="material-symbols-outlined text-sm">vpn_key</span></button>
-                                        <button onClick={toggleTheme} className={`w-8 h-8 flex items-center justify-center border rounded-full transition-colors ${theme === 'retro' ? 'border-[#444] hover:bg-[#222]' : 'border-gray-200 hover:border-black'}`} title="Toggle Dark Mode"><span className="material-symbols-outlined text-sm">{theme === 'retro' ? 'wb_sunny' : 'contrast'}</span></button>
+                                        <button onClick={() => setCurrentView('upload')} className={`w-8 h-8 flex items-center justify-center border rounded-full transition-colors ${theme === 'retro' ? 'border-black' : 'border-gray-200 hover:border-black'}`} title="Admin Upload"><span className="material-symbols-outlined text-sm">vpn_key</span></button>
+                                        <button onClick={toggleTheme} className={`w-8 h-8 flex items-center justify-center border rounded-full transition-colors ${theme === 'retro' ? 'border-black' : 'border-gray-200 hover:border-black'}`} title="Toggle Dark Mode"><span className="material-symbols-outlined text-sm">{theme === 'retro' ? 'wb_sunny' : 'contrast'}</span></button>
                                     </div>
                                 </div>
 
-                                {/* Project List (Scrollable on Mobile) */}
                                 <div className="flex-1 flex flex-col justify-end min-h-0">
                                     <div className="flex-1 hidden lg:block"></div>
                                     <div className="text-sm font-bold mb-2 lg:hidden uppercase opacity-50">Recent Projects</div>
@@ -887,15 +1021,11 @@
                                 </div>
                             </div>
 
-                            {/* COLUMN 2: Main Content (Sticky on Mobile, Order 2) */}
-                            <div className={`w-full lg:w-2/4 lg:h-full flex flex-col relative group border-2 border-transparent order-2 lg:order-2 aspect-square lg:aspect-auto sticky top-[110px] lg:static z-20 transition-colors duration-300 ${theme === 'retro' ? 'bg-[#0F0F0F] lg:bg-transparent' : 'bg-white lg:bg-transparent'}`}>
+                            <div className={`w-full lg:w-2/4 lg:h-full flex flex-col relative group border-2 border-transparent order-2 lg:order-2 aspect-square lg:aspect-auto sticky top-[110px] lg:static z-20 transition-colors duration-300 ${theme === 'retro' ? 'bg-[#1a1a1a] lg:bg-transparent' : 'bg-white lg:bg-transparent'}`}>
                                 {renderMiddleColumn()}
                             </div>
 
-                            {/* COLUMN 3: Tools/Globe/Player (Order 1 for Menu, rest Hidden on Mobile) */}
                             <div className="w-full lg:w-1/4 h-auto lg:h-full flex flex-col gap-4 order-1 lg:order-3">
-                                
-                                {/* Desktop Cities Filter */}
                                 <div className="flex-none flex-wrap gap-2 content-start hidden lg:flex">
                                     {[...new Set(projectsData.map(p => p.location))].map(city => {
                                         const isActive = filterLocation === city || (selectedProject?.location === city);
@@ -909,19 +1039,16 @@
                                     <button className="text-[10px] underline uppercase opacity-60 hover:opacity-100 ml-2">+ More</button>
                                 </div>
 
-                                {/* Globe (Hidden on Mobile) */}
                                 <div className="flex-1 min-h-0 items-center justify-center relative border border-transparent hidden lg:flex">
                                     <GeoGlobe targetLocation={selectedProject?.location || filterLocation} />
                                 </div>
 
-                                {/* Desktop Player (Hidden on Mobile) */}
                                 <DesktopPlayer selectedProject={selectedProject} isPlaying={isPlaying} setIsPlaying={setIsPlaying} progress={progress} setProgress={setProgress} duration={duration} />
                             </div>
                         </div>
 
-                        {/* Desktop Footer Nav */}
                         <div className="h-20 justify-center w-full pt-6 relative hidden lg:flex">
-                            <div className={`w-2/4 flex justify-between items-start px-0 font-mono text-xs uppercase border-t pt-4 ${theme === 'retro' ? 'border-[#333]' : 'border-gray-200'}`}>
+                            <div className={`w-2/4 flex justify-between items-start px-0 font-mono text-xs uppercase border-t pt-4 ${theme === 'retro' ? 'border-black' : 'border-gray-200'}`}>
                                 <div className="flex gap-4">
                                     <button onClick={() => handleNavigation('prev')} className="hover:opacity-50 transition-opacity">← Prev</button>
                                     <button onClick={() => handleNavigation('next')} className="hover:opacity-50 transition-opacity">Next →</button>
@@ -936,7 +1063,6 @@
                         </div>
                     </div>
 
-                    {/* Mobile Fixed Player */}
                     <MobilePlayer selectedProject={selectedProject} isPlaying={isPlaying} setIsPlaying={setIsPlaying} progress={progress} setProgress={setProgress} />
                 </div>
             );
@@ -944,17 +1070,31 @@
 
         function App() {
             const [theme, setTheme] = useState('modern');
+            
+            // Re-written AudioContext initialization to close successfully and avoid hitting hardware limits.
             const toggleTheme = () => {
-                const ctx = new (window.AudioContext || window.webkitAudioContext)();
-                const osc = ctx.createOscillator();
-                const gain = ctx.createGain();
-                osc.connect(gain); gain.connect(ctx.destination);
-                osc.type = theme === 'modern' ? 'square' : 'sine';
-                osc.frequency.setValueAtTime(theme === 'modern' ? 220 : 440, ctx.currentTime);
-                gain.gain.setValueAtTime(0.1, ctx.currentTime);
-                osc.start(); gain.gain.exponentialRampToValueAtTime(0.00001, ctx.currentTime + 0.15); osc.stop(ctx.currentTime + 0.15);
+                try {
+                    const ctx = new (window.AudioContext || window.webkitAudioContext)();
+                    const osc = ctx.createOscillator();
+                    const gain = ctx.createGain();
+                    osc.connect(gain); gain.connect(ctx.destination);
+                    osc.type = theme === 'modern' ? 'square' : 'sine';
+                    osc.frequency.setValueAtTime(theme === 'modern' ? 220 : 440, ctx.currentTime);
+                    gain.gain.setValueAtTime(0.1, ctx.currentTime);
+                    osc.start(); 
+                    gain.gain.exponentialRampToValueAtTime(0.00001, ctx.currentTime + 0.15); 
+                    osc.stop(ctx.currentTime + 0.15);
+                    
+                    // Safely close context to prevent crash on subsequent toggles
+                    setTimeout(() => {
+                        if (ctx.state !== 'closed') ctx.close();
+                    }, 200);
+                } catch (e) {
+                    console.warn("Audio feedback not supported or failed", e);
+                }
                 setTheme(prev => prev === 'modern' ? 'retro' : 'modern');
             };
+            
             return (
                 <ThemeContext.Provider value={{ theme, toggleTheme }}>
                     <div className={`w-full h-full ${theme === 'retro' ? 'retro-mode' : ''}`}><AppContent /></div>
